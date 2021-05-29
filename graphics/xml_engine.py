@@ -1,0 +1,132 @@
+# -*- coding: utf-8 -*-
+
+from xml.etree.ElementTree import ElementTree, Element, SubElement, ParseError
+from PIL import Image, ImageDraw, ImageFont, ImageColor
+from .canvas_object import CanvasObject
+
+# Допустимые типы фигур: прямоугольник, линия, круг (эллипс)
+acceptable_figure_types = ['rectangle', 'line', 'circle', 'text']
+
+
+class GeometryDrawingError(Exception):
+    pass
+
+
+# Функция действует как enumerate, только если аргумент не итерируется, то возвращает его с номером 0.
+def new_enumerate(iterable):
+    count = 0
+    result = []
+    try:
+        for v in iterable:
+            result.append((count, v))
+            count += 1
+    except TypeError:
+        return [(0, iterable)]
+    else:
+        return result
+
+
+def get_figures(source):
+    # Открываем .gd файл (Geometry Drawing)
+    f = ElementTree(file=source)
+    # Получаем корневую секцию
+    root = f.getroot()
+    # Получаем все фигуры
+    root_children = list(list(root)[1])
+    cell_size = float(list(root)[0].attrib["cellsize"])
+    # Сюда будут сохраняться данные о фигруах из файла
+    # В виде объектов CanvasObject
+    figures = []
+    # Проходимся по фигурам
+    for figure in root_children:
+        # Получаем атрибуты фигуры: ее имя и тип
+        figure_options = figure.attrib
+        # Если тип фигуры, указанный в .gd файле не соотвествует допустимым типам, то кидаем ошибку
+        if figure_options['type'].lower() not in acceptable_figure_types:
+            raise GeometryDrawingError('An error in .gd file: unacceptable figure type: "%s"' % figure_options['type'])
+        # Сюда будут сохраняться координаты точек фигуры
+        figure_coords = []
+        for coord in list(figure):
+            figure_coords.append(float(coord.text))
+        # Создаем объект CanvasObject, передаем в него все данные фигуры
+        canvas_obj = CanvasObject(figure_options['type'], figure_coords)
+        canvas_obj.kwargs = figure_options
+        # Добавляем в список данных о фигурах объект CanvasObject
+        figures.append(canvas_obj)
+    return figures, cell_size
+
+
+def save_figures(figures, cell_size):
+    
+    # Создаем корень .gd файла
+    root = Element('content')
+    # Метаданные (содержат размер клеток)
+    metadata = SubElement(root, 'meta', attrib={"cellsize": str(cell_size)})
+    # Подэлемент, содержащий все фигуры
+    drawing = SubElement(root, 'drawing')
+
+    # Проходимся по всем фигурам для сохранения
+    for figure in figures:
+        # Формируем словарь "правильных" аттрибутов
+        valid_attributes = {'type': figure.figure, 'name': figure.kwargs['tag'],
+                            'fill': figure.kwargs['fill']}
+        if 'outline' in figure.kwargs.keys():
+            valid_attributes['outline'] = figure.kwargs['outline']
+        # Если фигура - текст:
+        if figure.figure == "text":
+            valid_attributes["text"] = figure.kwargs["text"]
+        # Создаем подэлемент, указываем имя, тип фигуры, цвет линии и цвет заливки
+        sub = SubElement(drawing, 'figure', attrib=valid_attributes)
+        for n, coord in new_enumerate(figure.args[0]):
+            coord_elem = SubElement(sub, 'coord%s' % n)
+            coord_elem.text = str(coord)
+            n += 1
+
+    # Возвращаем XML-код в виде объекта Element
+    return root
+
+
+# Список фигур (и их атрибутов) в PNG-изображение
+def figures2png(figures, path):
+    # Создаем PNG-файл
+    image = Image.new("RGBA", (586, 394), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(image)
+    image_font = ImageFont.truetype("verdana.ttf", size=10)  # Шрифт для текстов
+
+    # Проходимя по фигурам
+    for figure in figures:
+        # Если у фигуры нет заливки (заливка прозрачная), то ставим полную прозрачность
+        if not figure.kwargs['fill']:
+            fill = (0, 0, 0, 0)
+        # Иначе, ставим нужную заливку
+        else:
+            fill = ImageColor.getcolor(figure.kwargs['fill'], "RGBA")
+        # Цвет линии обозначается параметром "fill", а outline в таком случае - пустая строка
+        if "outline" not in figure.kwargs.keys():
+            fill = figure.kwargs['fill']
+        else:
+            outline = figure.kwargs['outline']
+        # Если линия, рисуем линию по координатам
+        # figure.args - это координаты
+        # figure.figure - это тип фигуры
+        if figure.figure == "line":
+            draw.line(xy=figure.args[0], fill=outline)
+        # Если прямоугольник, то рисуем прямоугольник без заливки по координатам
+        if figure.figure == "rectangle":
+            print(figure.args[0], fill, outline)
+            draw.rectangle(xy=figure.args[0], fill=fill, outline=outline)
+        if figure.figure == "circle":
+            draw.ellipse(xy=figure.args[0], fill=fill, outline=outline)
+        if figure.figure == "text":
+            draw.multiline_text(xy=figure.args[0], text=figure.kwargs["text"], fill=fill,
+                                font=image_font)
+    # Сохраняем изображение
+    del draw
+    image.save(path, "PNG")
+
+
+# Запись XML в файл
+def write_to_file(xml, to_file):
+    # Создаем файл, записываем в него то, что получилось
+    my_tree = ElementTree(xml)
+    my_tree.write(to_file)
