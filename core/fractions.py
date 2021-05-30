@@ -265,10 +265,6 @@ class Fraction:
     # Умножение с присваиванием
     def __imul__(self, other):
         m = self.__mul__(other)
-        if isinstance(m, int):
-            m = int2fraction(m)
-        elif isinstance(m, float):
-            m = float2ordinary(m)
         self.assign(m)
         return self
 
@@ -297,13 +293,13 @@ class Fraction:
         return result
 
     # Деление с присваиванием
-    def __idiv__(self, other):
+    def __itruediv__(self, other):
         m = self.__truediv__(other)
         self.assign(m)
         return self
 
     # Деление на дробь
-    def __rdiv__(self, other):
+    def __rtruediv__(self, other):
         return self.__truediv__(other)
 
     # Целочисленное деление
@@ -312,7 +308,9 @@ class Fraction:
 
     # Целочисленнное деление с присваиваением
     def __ifloordiv__(self, other):
-        pass
+        m = self.__floordiv__(other)
+        self.assign(m)
+        return self
 
     # Целочисленное деление на дробь
     def __rfloordiv__(self, other):
@@ -341,6 +339,20 @@ class Fraction:
     # Остаток от деления дроби на другое значение
     def __mod__(self, other):
         return (self / other) - (self // other)
+
+    # Остаток от деления с присваиванием
+    def __imod__(self, other):
+        m = self.__mod__(other)
+        self.assign(m)
+        return self
+
+    # Остаток от деления другого значения на дробь
+    def __rmod__(self, other):
+        return (other / self) - (other // self)
+
+    # Отсечение дробной части
+    def __trunc__(self):
+        return self.integer_part
 
     # Модуль дроби
     def __abs__(self):
@@ -480,13 +492,15 @@ class Fraction:
     def assign(self, m):
         # Приводим все в нужный формат
         if isinstance(m, int):
-            m = int2fraction(m)
+            _m = int2fraction(m)
         elif isinstance(m, float):
-            m = float2ordinary(m)
+            _m = float2ordinary(m)
+        else:
+            _m = m
 
-        self.numerator = m.numerator
-        self.denominator = m.denominator
-        self.integer_part = m.integer_part
+        self.numerator = _m.numerator
+        self.denominator = _m.denominator
+        self.integer_part = _m.integer_part
         self.update_fraction()
 
     # Обновить строку с дробью
