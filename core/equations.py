@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from copy import copy
-from .fractions import Fraction
+from .fractions import to_fraction
 
 """
 Решение уравнений на Python.
@@ -124,7 +124,8 @@ class AbstractSymbol:
     # Если дробь в ответе нельзя перевести в десятичную, то оставляем в видео обыконовенной
     @staticmethod
     def accurate_result(a, b):
-        f = Fraction("%s/%s" % (a, b)).reduce()
+        # Делим a на b (в виде дробей), если не получится перевести частное в десятичную дробь
+        f = (to_fraction(a) / to_fraction(b)).reduce()
         if not f.is_translatable_to_decimal() and (a % b):  # И если "a" не делится на "b"
             return f.format_to_mixed_number()
         return a / b

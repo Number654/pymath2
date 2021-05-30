@@ -3,6 +3,7 @@
 from .pymath import gcd, lcm, prime_factorization, better_divmod, root, trunc
 
 
+# Является ли сторка числом с плавающей точкой?
 def isfloat(string):
     try:
         float(string)
@@ -43,6 +44,16 @@ def strings_list2fractions_list(my_list):
             new_list.append(Fraction(m))
 
     return new_list
+
+
+# Любой числовой объект в обыкновенную дробь
+def to_fraction(__obj):
+    if isinstance(__obj, Fraction):
+        return __obj
+    elif isinstance(__obj, int):
+        return int2fraction(__obj)
+    elif isinstance(__obj, float):
+        return float2ordinary(__obj)
 
 
 # Проверить список по маске: найти в списке элементы, отличные от тех, что указаны в маске
@@ -231,6 +242,7 @@ class Fraction:
     def __radd__(self, other):
         return self.__add__(other)
 
+    # Вычитание
     def __sub__(self, other):
         return self.__add__(-other)
 
@@ -240,6 +252,7 @@ class Fraction:
         self.assign(s)
         return self
 
+    # Вычитание из другого числа дробь
     def __rsub__(self, other):
         return (-self).__add__(other)
 
