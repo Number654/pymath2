@@ -493,6 +493,12 @@ class Fraction:
     # Нужна для арифметических действий с присваиванием.
     # Например: self.__iadd__() - сложение с присваиванием
     def assign(self, m):
+        # Приводим все в нужный формат
+        if isinstance(m, int):
+            m = int2fraction(m)
+        elif isinstance(m, float):
+            m = float2ordinary(m)
+
         self.numerator = m.numerator
         self.denominator = m.denominator
         self.integer_part = m.integer_part
