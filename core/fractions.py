@@ -225,10 +225,6 @@ class Fraction:
     # Сложение с присваиванием (изменением числителя и знаменателя)
     def __iadd__(self, other):
         a = self.__add__(other)
-        if isinstance(a, int):
-            a = int2fraction(a)
-        elif isinstance(a, float):
-            a = float2ordinary(a)
         self.assign(a)
         return self
 
@@ -241,10 +237,6 @@ class Fraction:
     # Вычитание с присваиванием (тоже, что и со сложением, только наоборот)
     def __isub__(self, other):
         s = self.__sub__(other)
-        if isinstance(s, int):
-            s = int2fraction(s)
-        elif isinstance(s, float):
-            s = float2ordinary(s)
         self.assign(s)
         return self
 
@@ -307,10 +299,6 @@ class Fraction:
     # Деление с присваиванием
     def __idiv__(self, other):
         m = self.__truediv__(other)
-        if isinstance(m, int):
-            m = int2fraction(m)
-        elif isinstance(m, float):
-            m = float2ordinary(m)
         self.assign(m)
         return self
 
@@ -342,10 +330,7 @@ class Fraction:
     # Возведение в степень с присваиванием
     def __ipow__(self, power):
         m = self.__pow__(power)
-        if isinstance(m, int):
-            m = int2fraction(m)
-        self.integer_part = m.integer_part
-        self.numerator, self.denominator, self.fraction = m.numerator, m.denominator, m.fraction
+        self.assign(m)
         return self
 
     # Возведение другого числа в дробную степень
