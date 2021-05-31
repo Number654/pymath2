@@ -207,11 +207,12 @@ class Fraction:
             self.denominator = int(self.fraction.split('/')[1])
             self.integer_part = 0
 
+        self.assign(self.format_sign())  # Упрощаем запись дроби со знаком
+
     # Когда пишем: print(fraction) - выводим на экран дробь
     def __str__(self):
         return self.fraction
 
-    # Печать списков, содержащих экземпляры данного класса
     def __repr__(self):
         return str(self.__str__())
 
@@ -461,6 +462,22 @@ class Fraction:
             return False
         else:
             return True
+
+    # Упростить знак дроби
+    # Например, если у дроби и числитель, и знаменатель имеют минусы, то дробь будет
+    # Положительной.
+    def format_sign(self):
+        if not self.is_mixed_number():
+            if self.numerator < 0 and self.denominator < 0:
+                return Fraction("%s/%s" % (abs(self.numerator), abs(self.denominator)))
+            elif self.denominator < 0:
+                return Fraction("%s/%s" % (-self.numerator, abs(self.denominator)))
+            return self
+
+        # Знак у смешанного числа должен быть указан ТОЛЬКО перед дробной частью
+        elif self.is_mixed_number() and (self.numerator < 0 or self.denominator < 0):
+            raise ValueError("Invalid fraction: '%s'. Sign must be defined before integer part" % self.fraction)
+        return self
 
     # Метод для перевода этой и другой дробей в неправильные дроби
     # Этот метод необходим для выполнения арифметических действий с дробями (+, -)
