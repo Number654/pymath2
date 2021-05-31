@@ -580,10 +580,6 @@ class Double(Fraction):
         self.assign(self.__add__(other))
         return self
 
-    # Отраженное сложение
-    def __radd__(self, other):
-        return self.__add__(other)
-
     # Вычитание
     def __sub__(self, other):
         return Double.from_fraction(super(Double, self).__sub__(other))
@@ -592,10 +588,6 @@ class Double(Fraction):
     def __isub__(self, other):
         self.assign(self.__sub__(other))
         return self
-
-    # Отраженное вычитание
-    def __rsub__(self, other):
-        return self.__sub__(other)
 
     # Умножение
     def __mul__(self, other):
@@ -606,10 +598,6 @@ class Double(Fraction):
         self.assign(self.__mul__(other))
         return self
 
-    # Отраженное умножение
-    def __rmul__(self, other):
-        return self.__mul__(other)
-
     # Деление
     def __truediv__(self, other):
         return Double.from_fraction(super(Double, self).__truediv__(other))
@@ -618,10 +606,6 @@ class Double(Fraction):
     def __idiv__(self, other):
         self.assign(self.__truediv__(other))
         return self
-
-    # Отраженное деление
-    def __rdiv__(self, other):
-        return self.__truediv__(other)
 
     # Возведение в степень
     def __pow__(self, power):
@@ -632,10 +616,6 @@ class Double(Fraction):
         self.assign(self.__pow__(power))
         return self
 
-    # Отраженное возведение в степень
-    def __rpow__(self, power):
-        return self.__pow__(power)
-
     # Перевести тип Fraction в тип Double
     @staticmethod
     def from_fraction(f):
@@ -643,6 +623,8 @@ class Double(Fraction):
             return f
         elif isinstance(f, int):
             return Double("%s.0" % f)
+        elif isinstance(f, float):
+            return Double(str(f))
 
         f = f.to_decimal()
         if f.integer_part:
