@@ -184,6 +184,8 @@ class Fraction:
             self.fraction = float2ordinary(fraction).fraction
         elif isinstance(fraction, int):
             self.fraction = int2fraction(fraction).fraction
+        elif isinstance(fraction, Double):
+            self.fraction = fraction.fraction  # Можно передать в конструктор экземпляр класса Double
         else:
             if fraction.isdigit():
                 self.fraction = int2fraction(int(fraction)).fraction
@@ -368,8 +370,8 @@ class Fraction:
 
     # Проверка дроби на неправильность
     def is_improper(self):
-        # Если модуль числителя >= знаменателя, то это неправильная дробь
-        if abs(self.numerator) >= self.denominator:
+        # Если модуль числителя >= модулю знаменателя, то это неправильная дробь
+        if abs(self.numerator) >= abs(self.denominator):
             return True
         else:
             return False
