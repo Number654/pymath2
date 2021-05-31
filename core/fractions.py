@@ -258,11 +258,8 @@ class Fraction:
 
     # Умножение
     def __mul__(self, other):
-        # Если множитель является целым числом, то переводим его в дробь
-        if type(other) is int:
-            other = int2fraction(other)
-        if type(other) is float:
-            other = float2ordinary(other)
+        # Приводим другое число в обыкновенную дробь
+        other = to_fraction(other)
 
         self_m = self.format_to_improper_fraction()
         other_m = other.format_to_improper_fraction()
@@ -286,11 +283,8 @@ class Fraction:
 
     # Деление
     def __truediv__(self, other):
-        # Если делитель является целым числом, то переводим его в дробь
-        if type(other) is int:
-            other = int2fraction(other)
-        if type(other) is float:
-            other = float2ordinary(other)
+        # Приводим другое число в обыкновенную дробь
+        other = to_fraction(other)
 
         # Переводим, если дроби - смешанные числа, в неправильные дроби
         this_fraction = self.format_to_improper_fraction()
@@ -484,10 +478,7 @@ class Fraction:
     # Этот метод необходим для выполнения арифметических действий с дробями (+, -)
     # Для умножения и деления дробей этот метод не нужен
     def _arithmetic_formatting(self, other):
-        if isinstance(other, float):
-            other = float2ordinary(other)
-        if isinstance(other, int):
-            other = int2fraction(other)
+        other = to_fraction(other)
 
         # Переводим, если дроби - смешанные числа, в неправильные дроби
         this_fraction = self.format_to_improper_fraction()
@@ -503,13 +494,7 @@ class Fraction:
     # Нужна для арифметических действий с присваиванием.
     # Например: self.__iadd__() - сложение с присваиванием
     def assign(self, m):
-        # Приводим все в нужный формат
-        if isinstance(m, int):
-            _m = int2fraction(m)
-        elif isinstance(m, float):
-            _m = float2ordinary(m)
-        else:
-            _m = m
+        _m = to_fraction(m)
 
         self.numerator = _m.numerator
         self.denominator = _m.denominator
