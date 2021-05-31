@@ -283,21 +283,7 @@ class Fraction:
 
     # Деление
     def __truediv__(self, other):
-        # Приводим другое число в обыкновенную дробь
-        other = to_fraction(other)
-
-        # Переводим, если дроби - смешанные числа, в неправильные дроби
-        this_fraction = self.format_to_improper_fraction()
-        other_fraction = other.format_to_improper_fraction()
-        rev = other_fraction.reverse()
-        result = Fraction('%s/%s' %
-                          (this_fraction.numerator * rev.numerator, this_fraction.denominator * rev.denominator))
-
-        # Если надо - сокращаем и переводим в смешанное число
-        result = result.reduce()
-        result = result.format_to_mixed_number()
-
-        return result
+        return self.__mul__(to_fraction(other).reverse())
 
     # Деление с присваиванием
     def __itruediv__(self, other):
@@ -307,7 +293,7 @@ class Fraction:
 
     # Деление на дробь
     def __rtruediv__(self, other):
-        return self.__truediv__(other)
+        return to_fraction(other).__mul__(self.reverse())
 
     # Целочисленное деление
     def __floordiv__(self, other):
