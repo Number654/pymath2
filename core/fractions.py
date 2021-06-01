@@ -570,6 +570,9 @@ class Double(Fraction):
         self.assign(self.__add__(other))
         return self
 
+    def __radd__(self, other):
+        return self.__add__(other)
+
     # Вычитание
     def __sub__(self, other):
         return Double.from_fraction(super(Double, self).__sub__(other))
@@ -578,6 +581,10 @@ class Double(Fraction):
     def __isub__(self, other):
         self.assign(self.__sub__(other))
         return self
+
+    # Вычесть из другого числа Double
+    def __rsub__(self, other):
+        return Double.from_fraction(super(Double, self).__rsub__(other))
 
     # Умножение
     def __mul__(self, other):
@@ -588,14 +595,21 @@ class Double(Fraction):
         self.assign(self.__mul__(other))
         return self
 
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
     # Деление
     def __truediv__(self, other):
         return Double.from_fraction(super(Double, self).__truediv__(other))
 
     # Деление с присваиванием
-    def __idiv__(self, other):
+    def __itruediv__(self, other):
         self.assign(self.__truediv__(other))
         return self
+
+    # Разделить другое число на Double
+    def __rtruediv__(self, other):
+        return Double.from_fraction(super(Double, self).__rtruediv__(other))
 
     # Возведение в степень
     def __pow__(self, power):
@@ -605,6 +619,10 @@ class Double(Fraction):
     def __ipow__(self, power):
         self.assign(self.__pow__(power))
         return self
+
+    # Возвести число в степень типа Double
+    def __rpow__(self, other):
+        return Double.from_fraction(super(Double, self).__rpow__(other))
 
     # Перевести тип Fraction в тип Double
     @staticmethod
