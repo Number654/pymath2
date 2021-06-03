@@ -79,13 +79,8 @@ def reduce_to_common_denominator(my_fractions):
     formatted_fractions = []
     # Если это смешанные числа, делаем из них неправильные дроби
     for fraction in fractions:
-        if fraction.is_mixed_number():
-            fraction1 = fraction.format_to_improper_fraction()
-        else:
-            fraction1 = fraction
-        # Проверяем дроби на сократимость, если сократимы - сокращаем их
-        if fraction1.is_contract():
-            fraction1 = fraction1.reduce()
+        fraction1 = fraction.format_to_improper_fraction()
+        fraction1 = fraction1.reduce()  # Сокращаем дроби
         # Числители и знаменатели отформатированных выше дробей
         numerators.append(fraction1.numerator)
         denominators.append(fraction1.denominator)
@@ -355,10 +350,34 @@ class Fraction:
         return Fraction("%s%s/%s" % (str(abs(self.integer_part))+"&" if self.integer_part else "",
                                      abs(self.numerator), abs(self.denominator)))
 
-    # Сравнение
-    # Тут все как с обычным сравнением, только результат - разность числителей
-    def __cmp__(self, other):
-        return self.__sub__(other).numerator
+    # ==
+    def __eq__(self, other):
+        return self.__compare(other, "==")
+
+    # !=
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    # <
+    def __lt__(self, other):
+        return self.__compare(other, "<")
+
+    # >
+    def __gt__(self, other):
+        return self.__compare(other, ">")
+
+    # <=
+    def __le__(self, other):
+        return self.__compare(other, "<=")
+
+    # >=
+    def __ge__(self, other):
+        return self.__compare(other, ">=")
+
+    # Общий алгоритм сравнения дробей, нужно лишь указать нужный операнд сравнения
+    def __compare(self, other, cmp_sign):
+        common = reduce_to_common_denominator([self, to_fraction(other)])  # Привести к общему знаменателю
+        return eval("common[0].numerator %s common[1].numerator" % cmp_sign)
 
     # Метод проверки дроби на смешанное число
     def is_mixed_number(self):
