@@ -541,15 +541,15 @@ class Double(Fraction):
         if not isinstance(double, str):
             raise ValueError("'Double' class supports only 'str' values")
 
+        self.double = double  # Десятичное представление
         x = double.split(".")
+
         # С целой частью
         if int(x[0]):
             super().__init__("%s&%s/%s" % (x[0], x[1], 10 ** len(x[1])))
         # Без целой части
         else:
             super().__init__("%s/%s" % (x[1], 10 ** len(x[1])))
-
-        self.double = double  # Десятичное представление
 
     def __str__(self):
         # Дело в том, что из-за того, что данный класс основан на классе
@@ -559,6 +559,10 @@ class Double(Fraction):
 
     def __repr__(self):
         return str(Double.from_fraction(self).double)
+
+    # Поменять знак числа
+    def __neg__(self):
+        return Double.from_fraction(super(Double, self).__neg__())
 
     # Сложение
     # Просто переводим тип Fraction в тип Double
@@ -623,6 +627,23 @@ class Double(Fraction):
     # Возвести число в степень типа Double
     def __rpow__(self, other):
         return Double.from_fraction(super(Double, self).__rpow__(other))
+
+    # Остаток от деления
+    def __mod__(self, other):
+        return Double.from_fraction(super(Double, self).__mod__(other))
+
+    # Остаток от деления с присваиванием
+    def __imod__(self, other):
+        self.assign(self.__mod__(other))
+        return self
+
+    # Остаток от деления на дробь Double
+    def __rmod__(self, other):
+        return Double.from_fraction(super(Double, self).__rmod__(other))
+
+    # Модуль Double
+    def __abs__(self):
+        return Double.from_fraction(super(Double, self).__abs__())
 
     # Перевести тип Fraction в тип Double
     @staticmethod
