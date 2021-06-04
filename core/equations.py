@@ -114,12 +114,11 @@ class AbstractSymbol:
     # Разделить букву на число
     def __truediv__(self, other):
         if isinstance(other, AbstractSymbol):
-            raise ValueError("x - any number")
-        else:
-            a = copy(self)
-            a.k /= other
-            a.y /= other
-            return a
+            raise ValueError("x - any number")  # Неизвестные сократятся в дроби, останутся только числа
+        a = copy(self)
+        a.k /= other
+        a.y /= other
+        return a
 
     # Если дробь в ответе нельзя перевести в десятичную, то оставляем в видео обыконовенной
     @staticmethod
@@ -155,8 +154,10 @@ class FractionalSymbol(AbstractSymbol):
         return self.accurate_result(self.k, z-self.y)
 
 
-# Автоматическое определение  вида уравнения
-class Equation:
+# Уравнение, которое может менять свой вид
+class Symbol(AbstractSymbol):
 
-    def __init__(self, eq):
-        pass
+    # Деление на букву - вот как уравнение меняет вид
+    def __rtruediv__(self, other):
+        if isinstance(other, AbstractSymbol):
+            raise ValueError("x - any number")  # Неизвестные сократятся в дроби, останутся только числа
