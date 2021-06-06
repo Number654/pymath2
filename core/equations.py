@@ -114,7 +114,7 @@ class AbstractSymbol:
     # Разделить букву на число
     def __truediv__(self, other):
         if isinstance(other, AbstractSymbol):
-            raise ValueError("x - any number")  # Неизвестные сократятся в дроби, останутся только числа
+            raise ValueError("x - any number")  # Неизвестные сократятся внутри дроби, останутся только числа
         a = copy(self)
         a.k /= other
         a.y /= other
@@ -124,10 +124,7 @@ class AbstractSymbol:
     @staticmethod
     def accurate_result(a, b):
         # Делим a на b (в виде дробей), если не получится перевести частное в десятичную дробь
-        f = (to_fraction(a) / to_fraction(b)).reduce()
-        if not f.is_translatable_to_decimal() and (a % b):  # И если "a" не делится на "b"
-            return f.format_to_mixed_number()
-        return a / b
+        return to_fraction(to_fraction(a) / to_fraction(b)).reduce().format_to_mixed_number()
 
     # Решить уравнение
     def get(self, z):
@@ -160,4 +157,4 @@ class Symbol(AbstractSymbol):
     # Деление на букву - вот как уравнение меняет вид
     def __rtruediv__(self, other):
         if isinstance(other, AbstractSymbol):
-            raise ValueError("x - any number")  # Неизвестные сократятся в дроби, останутся только числа
+            raise ValueError("x - any number")  # Неизвестные сократятся внутри дроби, останутся только числа
