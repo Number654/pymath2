@@ -256,6 +256,10 @@ class Fraction:
 
     # Умножение
     def __mul__(self, other):
+        # Если не получается умножить дробь на другое число, пытаемся сделать наоборот
+        if to_fraction(other) is None:
+            return other.__rmul__(self)
+
         # Приводим другое число в обыкновенную дробь
         other = to_fraction(other)
 
