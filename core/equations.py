@@ -32,30 +32,6 @@ def get_sign(x):
     return "-" if x < 0 else "+"
 
 
-# Схемы уравнений и схемы решения
-solvers = {
-    "k*x+y=z": "(z-y)/k",
-    "k*x-y=z": "(z+y)/k",
-    "y+k*x=z": "(z-y)/k",
-    "y-k*x=z": "(y-z)/k",
-
-    "x*k+y=z": "(z-y)/k",
-    "x*k-y=z": "(z+y)/k",
-    "y+x*k=z": "(z-y)/k",
-    "y-x*k=z": "(y-z)/k",
-
-    "k/x+y=z": "k/(z-y)",
-    "k/x-y=z": "k/(z+y)",
-    "y+k/x=z": "k/(z-y)",
-    "y-k/x=z": "k/(y-z)",
-
-    "x/k+y=z": "k*(z-y)",
-    "x/k-y=z": "k*(z+y)",
-    "y+x/k=z": "k*(z-y)",
-    "y-x/k=z": "k*(y-z)"
-}
-
-
 # Абстрактный класс для двух типов уравнений: линейные и дробные
 class AbstractSymbol:
     # Буква - это неизвестное, умноженное на коэффициент и сложенное с дополнительным числом.
@@ -154,7 +130,12 @@ class FractionalSymbol(AbstractSymbol):
 # Уравнение, которое может менять свой вид
 class Symbol(AbstractSymbol):
 
-    # Деление на букву - вот как уравнение меняет вид
+    def __init__(self, k=1, y=0):
+        super().__init__(k=k, y=y)
+        self.is_linear = True  # Является ли уравнение линейным?
+
+    # Деление числа на букву - вот как уравнение меняет вид
     def __rtruediv__(self, other):
         if isinstance(other, AbstractSymbol):
             raise ValueError("x - any number")  # Неизвестные сократятся внутри дроби, останутся только числа
+        self.is_linear = not self.is_linear  # Вид уравнения меняется на противоположный
