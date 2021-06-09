@@ -285,6 +285,8 @@ class Fraction:
 
     # Деление
     def __truediv__(self, other):
+        if to_fraction(other) is None:  # Если не получается разделить дробь на другое число, делаем наоборот
+            return other.__rtruediv__(self)
         return self.__mul__(to_fraction(other).reverse())
 
     # Деление с присваиванием
