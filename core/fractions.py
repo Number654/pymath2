@@ -216,12 +216,13 @@ class Fraction:
         a = self.format_to_improper_fraction()
         a.numerator = -a.numerator
         a.update_fraction()  # Обновить дробь
-        return a.format_to_mixed_number()
+        return a
 
     # Функция сложения этой дроби с другой
     def __add__(self, other):
         # Выполняем необходимые преобразования
         formatted = self._arithmetic_formatting(other)
+
         # Складываем преобразованные дроби
         result = Fraction('%s/%s' % (formatted[0].numerator + formatted[1].numerator,
                                      formatted[0].denominator))
