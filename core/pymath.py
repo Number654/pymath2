@@ -232,7 +232,7 @@ def arcctg(x):
 
 # Улучшенное деление с остатком (отсечение дробной части вместо округления)
 def better_divmod(x, y):
-    return trunc(x / y), x % y
+    return trunc(x / y), abs(x - y * trunc(x / y))
 
 
 # Среднее геометрическое
