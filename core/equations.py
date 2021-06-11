@@ -7,20 +7,13 @@ from .fractions import to_fraction
 Решение уравнений на Python.
 
 Основная задача - упростить уравнение до вида:
+
     kx ± y = z
-    y ± kx = z
-
-    xk ± y = z
-    y ± xk = z
-
+       или
     k/x ± y = z
-    y ± k/x = z
-
-    x/k ± y = z
-    y ± x/k = z
 
 где k - коэффициент неизвестного,  x - само неизвестное, y - слагаемое или вычитаемое,
-z - равное выражению число.
+z - равное выражению число (правая часть уравнения).
 """
 
 
@@ -77,11 +70,10 @@ class AbstractSymbol:
     def __mul__(self, other):
         if isinstance(other, AbstractSymbol):
             raise TypeError("'equations' module does not support 'power equations'")
-        else:
-            a = copy(self)
-            a.k *= other
-            a.y *= other
-            return a
+        a = copy(self)
+        a.k *= other
+        a.y *= other
+        return a
 
     # Умножить число на букву
     def __rmul__(self, other):
@@ -92,11 +84,11 @@ class AbstractSymbol:
         if isinstance(other, AbstractSymbol):
             raise ValueError("x - any number")  # Неизвестные сократятся внутри дроби, останутся только числа
         a = copy(self)
-        a.k /= other
-        a.y /= other
+        a.k = self.accurate_result(a.k, other)
+        a.y = self.accurate_result(a.y, other)
         return a
 
-    # Если дробь в ответе нельзя перевести в десятичную, то оставляем в видео обыконовенной
+    # Если дробь в ответе нельзя перевести в десятичную, то оставляем в виде обыконовенной
     @staticmethod
     def accurate_result(a, b):
         # Делим a на b (в виде дробей), если не получится перевести частное в десятичную дробь
@@ -134,8 +126,26 @@ class Symbol(AbstractSymbol):
         super().__init__(k=k, y=y)
         self.is_linear = True  # Является ли уравнение линейным?
 
+    # Здесь определяется еще и знак между числом "k" и неизвестным
+    def __str__(self):
+        return "%s%sx%s" % (self.k, "*" if self.is_linear else "/", format_sign(self.y))
+
+    def get(self, z):
+        if self.is_linear:
+            return self.accurate_result(z-self.y, self.k)  # Решение линейного уравнения
+        return self.accurate_result(self.k, z-self.y)  # Решение дробного уравнения
+
     # Деление числа на букву - вот как уравнение меняет вид
     def __rtruediv__(self, other):
         if isinstance(other, AbstractSymbol):
             raise ValueError("x - any number")  # Неизвестные сократятся внутри дроби, останутся только числа
-        self.is_linear = not self.is_linear  # Вид уравнения меняется на противоположный
+
+        f_other = to_fraction(other).format_to_improper_fraction()  # Другое число в неправильную дробь
+        a = copy(self)
+        a.is_linear = not a.is_linear  # Вид меняется на противоположный
+
+        # Делим числитель другой дроби на произведение коэффициента буквы и знаменателя другой дроби
+        # Затем так же, только произведение числа "k" и знаменателя другой дроби
+        a.k = self.accurate_result(f_other.numerator, a.k * f_other.denominator)
+        a.y = self.accurate_result(f_other.numerator, a.y * f_other.denominator) if a.y else 0  # Устраняем деление на 0
+        return a
