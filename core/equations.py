@@ -25,13 +25,23 @@ def get_sign(x):
     return "-" if x < 0 else "+"
 
 
+class AnyNumber:
+
+    def __str__(self):
+        return "Any Number"
+
+    def __repr__(self):
+        return str(self.__str__())
+
+
 # Абстрактный класс для двух типов уравнений: линейные и дробные
 class AbstractSymbol:
     # Буква - это неизвестное, умноженное на коэффициент и сложенное с дополнительным числом.
 
-    def __init__(self, k=1, y=0):
-        self.k = k
-        self.y = y
+    def __init__(self, symbol="x"):
+        self.k = 1
+        self.y = 0
+        self.symbol = symbol
 
     # Одинаково для всех
     def __repr__(self):
@@ -82,7 +92,7 @@ class AbstractSymbol:
     # Разделить букву на число
     def __truediv__(self, other):
         if isinstance(other, AbstractSymbol):
-            raise ValueError("x - any number")  # Неизвестные сократятся внутри дроби, останутся только числа
+            return AnyNumber()  # Неизвестные сократятся внутри дроби, останутся только числа
         a = copy(self)
         a.k = self.accurate_result(a.k, other)
         a.y = self.accurate_result(a.y, other)
@@ -103,7 +113,7 @@ class AbstractSymbol:
 class LinearSymbol(AbstractSymbol):
 
     def __str__(self):
-        return "%sx%s" % (self.k, format_sign(self.y))
+        return "%s%s%s" % (self.k, self.symbol, format_sign(self.y))
 
     def get(self, z):
         return self.accurate_result(z-self.y, self.k)
@@ -113,7 +123,7 @@ class LinearSymbol(AbstractSymbol):
 class FractionalSymbol(AbstractSymbol):
 
     def __str__(self):
-        return "%s/x%s" % (self.k, format_sign(self.y))
+        return "%s/%s%s" % (self.k, self.symbol, format_sign(self.y))
 
     def get(self, z):
         return self.accurate_result(self.k, z-self.y)
@@ -122,13 +132,13 @@ class FractionalSymbol(AbstractSymbol):
 # Уравнение, которое может менять свой вид
 class Symbol(AbstractSymbol):
 
-    def __init__(self, k=1, y=0):
-        super().__init__(k=k, y=y)
+    def __init__(self, symbol="x"):
+        super().__init__(symbol=symbol)
         self.is_linear = True  # Является ли уравнение линейным?
 
     # Здесь определяется еще и знак между числом "k" и неизвестным
     def __str__(self):
-        return "%s%sx%s" % (self.k, "*" if self.is_linear else "/", format_sign(self.y))
+        return "%s%s%s%s" % (self.k, "" if self.is_linear else "/", self.symbol, format_sign(self.y))
 
     def get(self, z):
         if self.is_linear:
@@ -138,7 +148,7 @@ class Symbol(AbstractSymbol):
     # Деление числа на букву - вот как уравнение меняет вид
     def __rtruediv__(self, other):
         if isinstance(other, AbstractSymbol):
-            raise ValueError("x - any number")  # Неизвестные сократятся внутри дроби, останутся только числа
+            return AnyNumber()  # Неизвестные сократятся внутри дроби, останутся только числа
 
         f_other = to_fraction(other).format_to_improper_fraction()  # Другое число в неправильную дробь
         a = copy(self)
