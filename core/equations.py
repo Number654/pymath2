@@ -102,7 +102,10 @@ class AbstractSymbol:
     @staticmethod
     def accurate_result(a, b):
         # Делим a на b (в виде дробей), если не получится перевести частное в десятичную дробь
-        return to_fraction(to_fraction(a) / to_fraction(b)).reduce().format_to_mixed_number()
+        f = to_fraction(to_fraction(a) / to_fraction(b)).reduce().format_to_mixed_number()
+        if f.is_translatable_to_decimal():
+            return a / b
+        return f
 
     # Решить уравнение
     def get(self, z):
