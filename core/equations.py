@@ -58,6 +58,12 @@ class AbstractSymbol:
     def __add__(self, other):
         a = copy(self)
         if isinstance(other, AbstractSymbol):
+            # Нельзя складывать / вычитать разнотипные буквы
+            if type(self) != type(other):
+                raise TypeError("Cannot add or subtract '%s' with '%s'" % (type(self), type(other)))
+            elif type(self) is Symbol and type(other) is Symbol:
+                if self.is_linear != other.is_linear:
+                    raise TypeError("Cannot add or subtract 'linear' and 'fractional' symbols")
             a.k += other.k
             a.y += other.y
         else:
@@ -102,10 +108,10 @@ class AbstractSymbol:
     @staticmethod
     def accurate_result(a, b):
         # Делим a на b (в виде дробей), если не получится перевести частное в десятичную дробь
-        f = to_fraction(to_fraction(a) / to_fraction(b)).reduce().format_to_mixed_number()
+        f = to_fraction(to_fraction(a) / to_fraction(b)).reduce()
         if f.is_translatable_to_decimal():
             return a / b
-        return f
+        return f.format_to_mixed_number()
 
     # Решить уравнение
     def get(self, z):
