@@ -35,7 +35,7 @@ class AnyNumber:
 
 
 # Абстрактный класс для двух типов уравнений: линейные и дробные
-class AbstractSymbol:
+class SuperSymbol:
     # Буква - это неизвестное, умноженное на коэффициент и сложенное с дополнительным числом.
 
     def __init__(self, symbol="x"):
@@ -57,11 +57,11 @@ class AbstractSymbol:
     # Сложить букву с числом
     def __add__(self, other):
         a = copy(self)
-        if isinstance(other, AbstractSymbol):
+        if isinstance(other, SuperSymbol):
             # Нельзя складывать / вычитать разнотипные буквы
             if type(self) != type(other):
                 raise TypeError("Cannot add or subtract '%s' with '%s'" % (type(self), type(other)))
-            elif type(self) is Symbol and type(other) is Symbol:
+            elif isinstance(self, Symbol) and isinstance(other, Symbol):
                 if self.is_linear != other.is_linear:
                     raise TypeError("Cannot add or subtract 'linear' and 'fractional' symbols")
             a.k += other.k
@@ -84,7 +84,7 @@ class AbstractSymbol:
 
     # Умножить букву на число
     def __mul__(self, other):
-        if isinstance(other, AbstractSymbol):
+        if isinstance(other, SuperSymbol):
             raise TypeError("'equations' module does not support 'power equations'")
         a = copy(self)
         a.k *= other
@@ -97,7 +97,7 @@ class AbstractSymbol:
 
     # Разделить букву на число
     def __truediv__(self, other):
-        if isinstance(other, AbstractSymbol):
+        if isinstance(other, SuperSymbol):
             return AnyNumber()  # Неизвестные сократятся внутри дроби, останутся только числа
         a = copy(self)
         a.k = self.accurate_result(a.k, other)
@@ -115,31 +115,37 @@ class AbstractSymbol:
 
     # Решить уравнение
     def get(self, z):
-        pass
+        if isinstance(z, SuperSymbol):  # Перенос слагаемого
+            if z.symbol != self.symbol:  # В линейном или в дробном уравнении должно быть только одно неизветсное
+                raise ValueError("Unexpected symbol: '%s'" % z.symbol)
+            return ((self.k-z.k)*Symbol(self.symbol)).get(z.y-self.y)
+        return "continue"  # Перенос слагаемого не потребовался, решить уравнение
 
 
 # z = k*x+y
-class LinearSymbol(AbstractSymbol):
+class LinearSymbol(SuperSymbol):
 
     def __str__(self):
         return "%s%s%s" % (self.k, self.symbol, format_sign(self.y))
 
     def get(self, z):
-        return self.accurate_result(z-self.y, self.k)
+        s_g = super().get(z)
+        return self.accurate_result(z-self.y, self.k) if s_g == "continue" else s_g
 
 
 # z = k/x+y
-class FractionalSymbol(AbstractSymbol):
+class FractionalSymbol(SuperSymbol):
 
     def __str__(self):
         return "%s/%s%s" % (self.k, self.symbol, format_sign(self.y))
 
     def get(self, z):
-        return self.accurate_result(self.k, z-self.y)
+        s_g = super().get(z)
+        return self.accurate_result(self.k, z-self.y) if s_g == "continue" else s_g
 
 
 # Уравнение, которое может менять свой вид
-class Symbol(AbstractSymbol):
+class Symbol(SuperSymbol):
 
     def __init__(self, symbol="x"):
         super().__init__(symbol=symbol)
@@ -150,13 +156,14 @@ class Symbol(AbstractSymbol):
         return "%s%s%s%s" % (self.k, "" if self.is_linear else "/", self.symbol, format_sign(self.y))
 
     def get(self, z):
+        s_g = super().get(z)
         if self.is_linear:
-            return self.accurate_result(z-self.y, self.k)  # Решение линейного уравнения
-        return self.accurate_result(self.k, z-self.y)  # Решение дробного уравнения
+            return self.accurate_result(z-self.y, self.k) if s_g == "continue" else s_g  # Решение линейного уравнения
+        return self.accurate_result(self.k, z-self.y) if s_g == "continue" else s_g  # Решение дробного уравнения
 
     # Деление числа на букву - вот как уравнение меняет вид
     def __rtruediv__(self, other):
-        if isinstance(other, AbstractSymbol):
+        if isinstance(other, SuperSymbol):
             return AnyNumber()  # Неизвестные сократятся внутри дроби, останутся только числа
 
         f_other = to_fraction(other).format_to_improper_fraction()  # Другое число в неправильную дробь
