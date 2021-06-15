@@ -104,6 +104,16 @@ class SuperSymbol:
         a.y = self.accurate_result(a.y, other)
         return a
 
+    # ==
+    def __eq__(self, other):
+        if not isinstance(other, SuperSymbol):
+            return
+        return self.k == other.k and self.y == other.y
+
+    # !=
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     # Если дробь в ответе нельзя перевести в десятичную, то оставляем в виде обыконовенной
     @staticmethod
     def accurate_result(a, b):
@@ -118,7 +128,11 @@ class SuperSymbol:
         if isinstance(z, SuperSymbol):  # Перенос слагаемого
             if z.symbol != self.symbol:  # В линейном или в дробном уравнении должно быть только одно неизветсное
                 raise ValueError("Unexpected symbol: '%s'" % z.symbol)
-            return ((self.k-z.k)*Symbol(self.symbol)).get(z.y-self.y)
+            elif self == z:  # Если у уравнения бесконечное количество решений ("x" - любое число)
+                return AnyNumber()
+            elif self != z:  # Если у уравнения нет решений ("x" не равен правой части уравнения)
+                return
+            return ((self.k - z.k) * Symbol(self.symbol)).get(z.y - self.y)
         return "continue"  # Перенос слагаемого не потребовался, решить уравнение
 
 
