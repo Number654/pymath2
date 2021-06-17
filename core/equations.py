@@ -3,19 +3,6 @@
 from copy import copy
 from .fractions import to_fraction
 
-"""
-Решение уравнений на Python.
-
-Основная задача - упростить уравнение до вида:
-
-    kx ± y = z
-       или
-    k/x ± y = z
-
-где k - коэффициент неизвестного,  x - само неизвестное, y - слагаемое или вычитаемое,
-z - равное выражению число (правая часть уравнения).
-"""
-
 
 def format_sign(x):
     return "-"+str(x).replace("-", "") if x < 0 else "+"+str(x).replace("+", "")
@@ -189,3 +176,46 @@ class Symbol(SuperSymbol):
         a.k = self.accurate_result(f_other.numerator, a.k * f_other.denominator)
         a.y = self.accurate_result(f_other.numerator, a.y * f_other.denominator) if a.y else 0  # Устраняем деление на 0
         return a
+
+
+# Уравнение с двумя неизвестными (для систем уравнений)
+class DoubleSymbol(Symbol):
+
+    def __init__(self, symbol1="x", symbol2="y"):
+        super().__init__(symbol=symbol1)
+        self.symbol2 = symbol2
+        self.k2 = 1  # Коэффициент второго неизвестного
+
+    def __str__(self):
+        return "%s%s%s%s%s%s%s" % (self.k, "" if self.is_linear else "/", self.symbol,
+                                   format_sign(self.k2), "" if self.is_linear else "/", self.symbol2,
+                                   format_sign(self.y))
+
+    def __neg__(self):
+        return DoubleSymbol.from_symbol(super().__neg__(), -self.k2, symbol1=self.symbol,
+                                        symbol2=self.symbol2)
+
+    def __mul__(self, other):
+        a = DoubleSymbol.from_symbol(super().__mul__(other), self.k2, symbol1=self.symbol,
+                                     symbol2=self.symbol2)
+        a.k2 *= other  # Просто умножаем еще и коэффициент второго неизвестного
+        return a
+
+    # ==
+    def __eq__(self, other):
+        return super().__eq__(other) and self.k2 == other.k2
+
+    def get(self, z):  # Решить можно только с помощью системы уравнений
+        raise TypeError("'DoubleSymbol' cannot be solved out of equations system")
+
+    # Из уравнения с одним неизвестным в уравнение с двумя неизвестными
+    @staticmethod
+    def from_symbol(obj, self_k2, symbol1="x", symbol2="y"):
+        a = DoubleSymbol(symbol1=symbol1, symbol2=symbol2)
+        a.k, a.y, a.k2 = obj.k, obj.y, self_k2  # Просто переносим данные
+        return a
+
+
+# Система уравнений
+class EqSystem:
+    pass
