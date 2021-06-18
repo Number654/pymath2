@@ -195,6 +195,14 @@ class DoubleSymbol(Symbol):
         return DoubleSymbol.from_symbol(super().__neg__(), -self.k2, symbol1=self.symbol,
                                         symbol2=self.symbol2)
 
+    def __add__(self, other):
+        a = DoubleSymbol.from_symbol(super().__add__(other), self.k2, symbol1=self.symbol,
+                                     symbol2=self.symbol2)
+        if isinstance(other, SuperSymbol):
+            if isinstance(other, DoubleSymbol):
+                a.k2 += other.k2  # Если складываем с другим "DoubleSymbol", то складываем и втроые коэффициенты
+        return a
+
     def __mul__(self, other):
         a = DoubleSymbol.from_symbol(super().__mul__(other), self.k2, symbol1=self.symbol,
                                      symbol2=self.symbol2)
@@ -209,6 +217,16 @@ class DoubleSymbol(Symbol):
         a.k2 = self.accurate_result(a.k2, other)  # Просто делим еще и коэффициент второго неизвестного
         return a
 
+    def __rtruediv__(self, other):
+        if isinstance(other, SuperSymbol):
+            raise ValueError("Cannot divide by other symbol: unknown values will mutually annihilate.")
+
+        f_other = to_fraction(other).format_to_improper_fraction()  # Пришлось снова переводить другое число в дробь
+        a = DoubleSymbol.from_symbol(super().__rtruediv__(other), self.k2, symbol1=self.symbol,
+                                     symbol2=self.symbol2)
+        a.k2 = self.accurate_result(f_other.numerator, a.k2 * f_other.denominator)  # Так же, как и с "k1"
+        return a
+
     # ==
     def __eq__(self, other):
         return super().__eq__(other) and self.k2 == other.k2
@@ -220,7 +238,8 @@ class DoubleSymbol(Symbol):
     @staticmethod
     def from_symbol(obj, self_k2, symbol1="x", symbol2="y"):
         a = DoubleSymbol(symbol1=symbol1, symbol2=symbol2)
-        a.k, a.y, a.k2 = obj.k, obj.y, self_k2  # Просто переносим данные, self_k2 - это "k" 2-го неизвестного
+        a.k, a.y, a.k2 = obj.k, obj.y, self_k2  # Просто переносим данные
+        # Т. к. это статический метод, аргумент "self_k2" предоставляет доступ к переменной self.k2
         return a
 
 
