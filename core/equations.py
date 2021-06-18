@@ -21,7 +21,7 @@ class AnyNumber:
         return str(self.__str__())
 
 
-# Абстрактный класс для двух типов уравнений: линейные и дробные
+# Суперкласс для двух типов уравнений: линейные и дробные
 class SuperSymbol:
     # Буква - это неизвестное, умноженное на коэффициент и сложенное с дополнительным числом.
 
@@ -201,6 +201,14 @@ class DoubleSymbol(Symbol):
         a.k2 *= other  # Просто умножаем еще и коэффициент второго неизвестного
         return a
 
+    def __truediv__(self, other):
+        if isinstance(other, SuperSymbol):
+            raise ValueError("Cannot divide by other symbol: unknown values will mutually annihilate.")
+        a = DoubleSymbol.from_symbol(super().__truediv__(other), self.k2, symbol1=self.symbol,
+                                     symbol2=self.symbol2)
+        a.k2 = self.accurate_result(a.k2, other)  # Просто делим еще и коэффициент второго неизвестного
+        return a
+
     # ==
     def __eq__(self, other):
         return super().__eq__(other) and self.k2 == other.k2
@@ -212,7 +220,7 @@ class DoubleSymbol(Symbol):
     @staticmethod
     def from_symbol(obj, self_k2, symbol1="x", symbol2="y"):
         a = DoubleSymbol(symbol1=symbol1, symbol2=symbol2)
-        a.k, a.y, a.k2 = obj.k, obj.y, self_k2  # Просто переносим данные
+        a.k, a.y, a.k2 = obj.k, obj.y, self_k2  # Просто переносим данные, self_k2 - это "k" 2-го неизвестного
         return a
 
 
