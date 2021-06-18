@@ -181,10 +181,10 @@ class Symbol(SuperSymbol):
 # Уравнение с двумя неизвестными (для систем уравнений)
 class DoubleSymbol(Symbol):
 
-    def __init__(self, symbol1="x", symbol2="y"):
+    def __init__(self, sub=False, symbol1="x", symbol2="y"):
         super().__init__(symbol=symbol1)
         self.symbol2 = symbol2
-        self.k2 = 1  # Коэффициент второго неизвестного
+        self.k2 = 1 if not sub else -1  # Если нужно вычесть второе неизвестное
 
     def __str__(self):
         return "%s%s%s%s%s%s%s" % (self.k, "" if self.is_linear else "/", self.symbol,
@@ -196,11 +196,27 @@ class DoubleSymbol(Symbol):
                                         symbol2=self.symbol2)
 
     def __add__(self, other):
+        if not isinstance(other, DoubleSymbol):  # Для сложения с другими типами уравнений
+            a = copy(self)
+            if other.symbol not in (self.symbol, self.symbol2):
+                raise ValueError("Invalid symbol: '%s'" % other.symbol)
+            # Ищем букву другого уравнения, и складываем коэффициент этой буквы с коэффициентом
+            # Такой же буквы в уравнении
+            if a.symbol == other.symbol:
+                a.k += other.k
+            elif a.symbol2 == other.symbol:
+                a.k2 += other.k
+            return a
+
         a = DoubleSymbol.from_symbol(super().__add__(other), self.k2, symbol1=self.symbol,
                                      symbol2=self.symbol2)
+
         if isinstance(other, SuperSymbol):
             if isinstance(other, DoubleSymbol):
                 a.k2 += other.k2  # Если складываем с другим "DoubleSymbol", то складываем и втроые коэффициенты
+
+        if a.k == 0 or a.k2 == 0:  # Если один из коэффициентов равен 0, то неизвестное(-ые) взаимоуничтожатся
+            raise ValueError("Zero coefficient, cannot solve equations system")
         return a
 
     def __mul__(self, other):
