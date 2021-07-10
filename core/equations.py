@@ -196,7 +196,8 @@ class DoubleSymbol(Symbol):
                                         symbol2=self.symbol2)
 
     def __add__(self, other):
-        if not isinstance(other, DoubleSymbol):  # Для сложения с другими типами уравнений
+        if isinstance(other, SuperSymbol) and \
+                not isinstance(other, DoubleSymbol):  # Для сложения с другими типами уравнений
             a = copy(self)
             if other.symbol not in (self.symbol, self.symbol2):
                 raise ValueError("Invalid symbol: '%s'" % other.symbol)
