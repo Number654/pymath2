@@ -157,7 +157,7 @@ class Symbol(SuperSymbol):
         return "%s%s%s%s" % (self.k, "" if self.is_linear else "/", self.symbol, format_sign(self.y))
 
     def get(self, z):
-        s_g = super().get(z)
+        s_g = super().get(z)  # Получение сигнала "continue" или уже результата
         if self.is_linear:
             return self.accurate_result(z-self.y, self.k) if s_g == "continue" else s_g  # Решение линейного уравнения
         return self.accurate_result(self.k, z-self.y) if s_g == "continue" else s_g  # Решение дробного уравнения
@@ -211,6 +211,7 @@ class DoubleSymbol(Symbol):
 
         a = DoubleSymbol.from_symbol(super().__add__(other), self.k2, symbol1=self.symbol,
                                      symbol2=self.symbol2)
+        a.is_linear = self.is_linear  # Указывем, линейное или дробное уравнение
 
         if isinstance(other, SuperSymbol):
             if isinstance(other, DoubleSymbol):
@@ -242,6 +243,7 @@ class DoubleSymbol(Symbol):
         a = DoubleSymbol.from_symbol(super().__rtruediv__(other), self.k2, symbol1=self.symbol,
                                      symbol2=self.symbol2)
         a.k2 = self.accurate_result(f_other.numerator, a.k2 * f_other.denominator)  # Так же, как и с "k1"
+        a.is_linear = not a.is_linear
         return a
 
     # ==
@@ -250,6 +252,13 @@ class DoubleSymbol(Symbol):
 
     def get(self, z):  # Решить можно только с помощью системы уравнений
         raise TypeError("'DoubleSymbol' cannot be solved out of equations system")
+
+    # Выразить "x" (первое неизвестное) из этого уравнения в системе
+    def express_x(self, z):
+        print(self.is_linear)
+        if self.is_linear:
+            return (z - Symbol(self.symbol2)-self.y) / self.k
+        return self.k / (z - Symbol(self.symbol2)-self.y)
 
     # Из уравнения с одним неизвестным в уравнение с двумя неизвестными
     @staticmethod
