@@ -255,10 +255,9 @@ class DoubleSymbol(Symbol):
 
     # Выразить "x" (первое неизвестное) из этого уравнения в системе
     def express_x(self, z):
-        print(self.is_linear)
         if self.is_linear:
-            return (z - Symbol(self.symbol2)-self.y) / self.k
-        return self.k / (z - Symbol(self.symbol2)-self.y)
+            return (z-self.k2*Symbol(self.symbol2)-self.y) / self.k
+        return self.k / (z - self.k2*Symbol(self.symbol2)-self.y)
 
     # Из уравнения с одним неизвестным в уравнение с двумя неизвестными
     @staticmethod
