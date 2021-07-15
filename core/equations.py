@@ -181,18 +181,19 @@ class Symbol(SuperSymbol):
 # Уравнение с двумя неизвестными (для систем уравнений)
 class DoubleSymbol(Symbol):
 
-    def __init__(self, sub=False, symbol1="x", symbol2="y"):
+    def __init__(self, z, sub=False, symbol1="x", symbol2="y"):
         super().__init__(symbol=symbol1)
+        self.z = z  # Сразу получаем правую часть уравнения
         self.symbol2 = symbol2
         self.k2 = 1 if not sub else -1  # Если нужно вычесть второе неизвестное
 
     def __str__(self):
-        return "%s%s%s%s%s%s%s" % (self.k, "" if self.is_linear else "/", self.symbol,
-                                   format_sign(self.k2), "" if self.is_linear else "/", self.symbol2,
-                                   format_sign(self.y))
+        return "%s%s%s%s%s%s%s=%s" % (self.k, "" if self.is_linear else "/", self.symbol,
+                                      format_sign(self.k2), "" if self.is_linear else "/", self.symbol2,
+                                      format_sign(self.y), self.z)
 
     def __neg__(self):
-        return DoubleSymbol.from_symbol(super().__neg__(), -self.k2, symbol1=self.symbol,
+        return DoubleSymbol.from_symbol(self.z, super().__neg__(), -self.k2, symbol1=self.symbol,
                                         symbol2=self.symbol2)
 
     def __add__(self, other):
@@ -209,7 +210,7 @@ class DoubleSymbol(Symbol):
                 a.k2 += other.k
             return a
 
-        a = DoubleSymbol.from_symbol(super().__add__(other), self.k2, symbol1=self.symbol,
+        a = DoubleSymbol.from_symbol(self.z, super().__add__(other), self.k2, symbol1=self.symbol,
                                      symbol2=self.symbol2)
         a.is_linear = self.is_linear  # Указывем, линейное или дробное уравнение
 
@@ -222,7 +223,7 @@ class DoubleSymbol(Symbol):
         return a
 
     def __mul__(self, other):
-        a = DoubleSymbol.from_symbol(super().__mul__(other), self.k2, symbol1=self.symbol,
+        a = DoubleSymbol.from_symbol(self.z, super().__mul__(other), self.k2, symbol1=self.symbol,
                                      symbol2=self.symbol2)
         a.k2 *= other  # Просто умножаем еще и коэффициент второго неизвестного
         return a
@@ -230,7 +231,7 @@ class DoubleSymbol(Symbol):
     def __truediv__(self, other):
         if isinstance(other, SuperSymbol):
             raise ValueError("Cannot divide by other symbol: unknown values will mutually annihilate.")
-        a = DoubleSymbol.from_symbol(super().__truediv__(other), self.k2, symbol1=self.symbol,
+        a = DoubleSymbol.from_symbol(self.z, super().__truediv__(other), self.k2, symbol1=self.symbol,
                                      symbol2=self.symbol2)
         a.k2 = self.accurate_result(a.k2, other)  # Просто делим еще и коэффициент второго неизвестного
         return a
@@ -240,7 +241,7 @@ class DoubleSymbol(Symbol):
             raise ValueError("Cannot divide by other symbol: unknown values will mutually annihilate.")
 
         f_other = to_fraction(other).format_to_improper_fraction()  # Пришлось снова переводить другое число в дробь
-        a = DoubleSymbol.from_symbol(super().__rtruediv__(other), self.k2, symbol1=self.symbol,
+        a = DoubleSymbol.from_symbol(self.z, super().__rtruediv__(other), self.k2, symbol1=self.symbol,
                                      symbol2=self.symbol2)
         a.k2 = self.accurate_result(f_other.numerator, a.k2 * f_other.denominator)  # Так же, как и с "k1"
         a.is_linear = not a.is_linear
@@ -254,15 +255,15 @@ class DoubleSymbol(Symbol):
         raise TypeError("'DoubleSymbol' cannot be solved out of equations system")
 
     # Выразить "x" (первое неизвестное) из этого уравнения в системе
-    def express_x(self, z):
+    def express_x(self):
         if self.is_linear:
-            return (z-self.k2*Symbol(self.symbol2)-self.y) / self.k
-        return self.k / (z - self.k2*Symbol(self.symbol2)-self.y)
+            return (self.z-self.y-self.k2*Symbol(self.symbol2)) / self.k
+        return self.k / (self.z-self.y-self.k2*Symbol(self.symbol2))
 
     # Из уравнения с одним неизвестным в уравнение с двумя неизвестными
     @staticmethod
-    def from_symbol(obj, self_k2, symbol1="x", symbol2="y"):
-        a = DoubleSymbol(symbol1=symbol1, symbol2=symbol2)
+    def from_symbol(z, obj, self_k2, symbol1="x", symbol2="y"):
+        a = DoubleSymbol(z, symbol1=symbol1, symbol2=symbol2)
         a.k, a.y, a.k2 = obj.k, obj.y, self_k2  # Просто переносим данные
         # Т. к. это статический метод, аргумент "self_k2" предоставляет доступ к переменной self.k2
         return a
@@ -270,4 +271,27 @@ class DoubleSymbol(Symbol):
 
 # Система уравнений
 class EqSystem:
-    pass
+
+    def __init__(self, eq1, eq2):
+        self.eq1 = eq1  # Первое уравнение в системе
+        self.eq2 = eq2  # Второе уравнение
+        self.symbol = eq1.symbol
+        self.symbol2 = eq1.symbol2
+
+    def __str__(self):
+        return " %s\n{\n %s" % (self.eq1, self.eq2)
+
+    def __repr__(self):
+        return str(self.__str__())
+
+    def get(self):
+        expressed_x = self.eq1.express_x()
+
+        if self.eq1.is_linear:
+            new_symbol = self.eq2.k*expressed_x+(self.eq2.k2*Symbol(self.symbol2)+self.eq2.y)
+        else:
+            new_symbol = self.eq2.k/expressed_x+(self.eq2.k2/Symbol(self.symbol2)+self.eq2.y)
+
+        v1 = new_symbol.get(self.eq2.z)
+        v2 = "TEMPORARY"
+        return {self.symbol: v1, self.symbol2: v2}
