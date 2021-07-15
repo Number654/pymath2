@@ -122,6 +122,10 @@ class SuperSymbol:
             return ((self.k - z.k) * Symbol(self.symbol)).get(z.y - self.y)
         return "continue"  # Перенос слагаемого не потребовался, решить уравнение
 
+    # Вычислить левую часть уравнения, подставив вместо неизвестного число "n"
+    def post_symbol(self, n):
+        pass
+
 
 # z = k*x+y
 class LinearSymbol(SuperSymbol):
@@ -133,6 +137,9 @@ class LinearSymbol(SuperSymbol):
         s_g = super().get(z)
         return self.accurate_result(z-self.y, self.k) if s_g == "continue" else s_g
 
+    def post_symbol(self, n):
+        return self.k*n+self.y
+
 
 # z = k/x+y
 class FractionalSymbol(SuperSymbol):
@@ -143,6 +150,9 @@ class FractionalSymbol(SuperSymbol):
     def get(self, z):
         s_g = super().get(z)
         return self.accurate_result(self.k, z-self.y) if s_g == "continue" else s_g
+
+    def post_symbol(self, n):
+        return self.accurate_result(self.k, n)+self.y
 
 
 # Уравнение, которое может менять свой вид
@@ -161,6 +171,11 @@ class Symbol(SuperSymbol):
         if self.is_linear:
             return self.accurate_result(z-self.y, self.k) if s_g == "continue" else s_g  # Решение линейного уравнения
         return self.accurate_result(self.k, z-self.y) if s_g == "continue" else s_g  # Решение дробного уравнения
+
+    def post_symbol(self, n):
+        if self.is_linear:
+            return self.k*n+self.y
+        return self.accurate_result(self.k, n)+self.y
 
     # Деление числа на букву - вот как уравнение меняет вид
     def __rtruediv__(self, other):
@@ -293,5 +308,5 @@ class EqSystem:
             new_symbol = self.eq2.k/expressed_x+(self.eq2.k2/Symbol(self.symbol2)+self.eq2.y)
 
         v1 = new_symbol.get(self.eq2.z)
-        v2 = "TEMPORARY"
+        v2 = expressed_x.post_symbol(v1)
         return {self.symbol: v1, self.symbol2: v2}
