@@ -309,4 +309,4 @@ class EqSystem:
 
         v1 = new_symbol.get(self.eq2.z)
         v2 = expressed_x.post_symbol(v1)
-        return {self.symbol: v1, self.symbol2: v2}
+        return {self.symbol: v2, self.symbol2: v1}
