@@ -193,23 +193,17 @@ class Symbol(SuperSymbol):
         return a
 
 
-# Уравнение с двумя неизвестными (для систем уравнений)
-class DoubleSymbol(Symbol):
+# Суперкласс всех уравнений с двумя неизвестными
+class SuperDoubleSymbol(Symbol):
 
-    def __init__(self, z, sub=False, symbol1="x", symbol2="y"):
+    def __init__(self, sub=False, symbol1="x", symbol2="y"):
         super().__init__(symbol=symbol1)
-        self.z = z  # Сразу получаем правую часть уравнения
         self.symbol2 = symbol2
         self.k2 = 1 if not sub else -1  # Если нужно вычесть второе неизвестное
 
-    def __str__(self):
-        return "%s%s%s%s%s%s%s=%s" % (self.k, "" if self.is_linear else "/", self.symbol,
-                                      format_sign(self.k2), "" if self.is_linear else "/", self.symbol2,
-                                      format_sign(self.y), self.z)
-
     def __neg__(self):
-        return DoubleSymbol.from_symbol(self.z, super().__neg__(), -self.k2, symbol1=self.symbol,
-                                        symbol2=self.symbol2)
+        return SuperDoubleSymbol.from_symbol(super().__neg__(), -self.k2, symbol1=self.symbol,
+                                             symbol2=self.symbol2)
 
     def __add__(self, other):
         if isinstance(other, SuperSymbol) and \
@@ -225,8 +219,8 @@ class DoubleSymbol(Symbol):
                 a.k2 += other.k
             return a
 
-        a = DoubleSymbol.from_symbol(self.z, super().__add__(other), self.k2, symbol1=self.symbol,
-                                     symbol2=self.symbol2)
+        a = SuperDoubleSymbol.from_symbol(super().__add__(other), self.k2, symbol1=self.symbol,
+                                          symbol2=self.symbol2)
         a.is_linear = self.is_linear  # Указывем, линейное или дробное уравнение
 
         if isinstance(other, SuperSymbol):
@@ -238,16 +232,16 @@ class DoubleSymbol(Symbol):
         return a
 
     def __mul__(self, other):
-        a = DoubleSymbol.from_symbol(self.z, super().__mul__(other), self.k2, symbol1=self.symbol,
-                                     symbol2=self.symbol2)
+        a = SuperDoubleSymbol.from_symbol(super().__mul__(other), self.k2, symbol1=self.symbol,
+                                          symbol2=self.symbol2)
         a.k2 *= other  # Просто умножаем еще и коэффициент второго неизвестного
         return a
 
     def __truediv__(self, other):
         if isinstance(other, SuperSymbol):
             raise ValueError("Cannot divide by other symbol: unknown values will mutually annihilate.")
-        a = DoubleSymbol.from_symbol(self.z, super().__truediv__(other), self.k2, symbol1=self.symbol,
-                                     symbol2=self.symbol2)
+        a = SuperDoubleSymbol.from_symbol(super().__truediv__(other), self.k2, symbol1=self.symbol,
+                                          symbol2=self.symbol2)
         a.k2 = self.accurate_result(a.k2, other)  # Просто делим еще и коэффициент второго неизвестного
         return a
 
@@ -256,18 +250,54 @@ class DoubleSymbol(Symbol):
             raise ValueError("Cannot divide by other symbol: unknown values will mutually annihilate.")
 
         f_other = to_fraction(other).format_to_improper_fraction()  # Пришлось снова переводить другое число в дробь
-        a = DoubleSymbol.from_symbol(self.z, super().__rtruediv__(other), self.k2, symbol1=self.symbol,
-                                     symbol2=self.symbol2)
+        a = SuperDoubleSymbol.from_symbol(super().__rtruediv__(other), self.k2, symbol1=self.symbol,
+                                          symbol2=self.symbol2)
         a.k2 = self.accurate_result(f_other.numerator, a.k2 * f_other.denominator)  # Так же, как и с "k1"
         a.is_linear = not a.is_linear
         return a
 
     # ==
     def __eq__(self, other):
-        return super().__eq__(other) and self.k2 == other.k2
+        raise TypeError("Equations (symbols with specified in __init__() 'z') can be equivalent, not equal")
 
     def get(self, z):  # Решить можно только с помощью системы уравнений
         raise TypeError("'DoubleSymbol' cannot be solved out of equations system")
+
+    # Из уравнения с одним неизвестным в уравнение с двумя неизвестными
+    @staticmethod
+    def from_symbol(obj, self_k2, symbol1="x", symbol2="y"):
+        a = SuperDoubleSymbol(symbol1=symbol1, symbol2=symbol2)
+        a.k, a.y, a.k2 = obj.k, obj.y, self_k2  # Просто переносим данные
+        # Т. к. это статический метод, аргумент "self_k2" предоставляет доступ к переменной self.k2
+        return a
+
+
+# Уравнение с двумя неизвестными, правая часть без неизвестных
+class DoubleSymbol(SuperDoubleSymbol):
+
+    def __init__(self, z, sub=False, symbol1="x", symbol2="y"):
+        super().__init__(sub=sub, symbol1=symbol1, symbol2=symbol2)
+        self.z = z  # Сразу получаем правую часть уравнения
+
+    def __str__(self):
+        return "%s%s%s%s%s%s%s=%s" % (self.k, "" if self.is_linear else "/", self.symbol,
+                                      format_sign(self.k2), "" if self.is_linear else "/", self.symbol2,
+                                      format_sign(self.y), self.z)
+
+    def __neg__(self):
+        return self._from_super(super().__neg__())
+
+    def __add__(self, other):
+        return self._from_super(super().__add__(other))
+
+    def __mul__(self, other):
+        return self._from_super(super().__mul__(other))
+
+    def __truediv__(self, other):
+        return self._from_super(super().__truediv__(other))
+
+    def __rtruediv__(self, other):
+        return self._from_super(super().__rtruediv__(other))
 
     # Выразить "x" (первое неизвестное) из этого уравнения в системе
     def express_x(self):
@@ -275,12 +305,12 @@ class DoubleSymbol(Symbol):
             return (self.z-self.y-self.k2*Symbol(self.symbol2)) / self.k
         return self.k / (self.z-self.y-self.k2*Symbol(self.symbol2))
 
-    # Из уравнения с одним неизвестным в уравнение с двумя неизвестными
-    @staticmethod
-    def from_symbol(z, obj, self_k2, symbol1="x", symbol2="y"):
-        a = DoubleSymbol(z, symbol1=symbol1, symbol2=symbol2)
-        a.k, a.y, a.k2 = obj.k, obj.y, self_k2  # Просто переносим данные
-        # Т. к. это статический метод, аргумент "self_k2" предоставляет доступ к переменной self.k2
+    def _from_super(self, obj):
+        # Добавить переменную экземпляра "self.z", которой нет в суперклассе
+        # "equations.SuperDoubleSymbol", то есть перенести все данные этого экземпляра
+        # И добавляем переменную "z".
+        a = DoubleSymbol(self.z, symbol1=obj.symbol, symbol2=obj.symbol2)
+        a.k, a.k2, a.y = obj.k, obj.k2, obj.y
         return a
 
 

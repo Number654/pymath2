@@ -24,7 +24,7 @@ class Clock:
         self.canvas = Canvas(self.tk, width=350, height=270)
         self.canvas.pack()
 
-        self.overclock_button = ttk.Button(self.tk, text="OVERCLOCK", width=20, command=self.overclock)
+        self.overclock_button = ttk.Button(self.tk, text="OVERCLOCK (SPEED x66.7)", width=28, command=self.overclock)
         self.overclock_button.pack(pady=10)
 
         self.tk.after_idle(self.time_process)  # Запустить процесс хода часов
@@ -63,8 +63,8 @@ class Clock:
 
         # Получаем точки концов стрелок в зависимости от времени
         self.s_point = circle_point(90, (s * 6 - 90) * pi / 180)
-        self.m_point = circle_point(70, ((m + s / 60) * 6 - 90) * pi / 180)  # (Минуты + секунды) / 60
-        self.h_point = circle_point(30, ((h + m / 60) * 30 - 90) * pi / 180)  # (Часы + минуты) / 60
+        self.m_point = circle_point(70, ((m + s / 60) * 6 - 90) * pi / 180)  # Минуты + (секунды / 60)
+        self.h_point = circle_point(30, ((h + m / 60) * 30 - 90) * pi / 180)  # Часы + (минуты / 60)
 
         # Отрисовыыаем стрелки
         self.s_arrow = self.canvas.create_line((175, 150), self.s_point[0] + 175,
@@ -77,7 +77,7 @@ class Clock:
     # Запустить процесс хода разогнанных часов
     def overclock(self):
         # Теперь разогнать часы нельзя, и нужно перезагрузить приложение, чтобы вернуться в обычный режим
-        self.overclock_button.config(text="RESTART TO VIEW REAL TIME", state="disabled", width=28)
+        self.overclock_button.config(text="RESTART TO VIEW REAL TIME", state="disabled")
         self.tk.after_cancel(self.tk.after_id)  # Остановить процесс хода обычных часов
         self.tk.after_idle(self.overclock_process)
         self.saved_time = [int(v) for v in time.strftime("%H:%M:%S").split(":")]  # Получаем текущее время и сохраняем
