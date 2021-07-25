@@ -201,6 +201,11 @@ class SuperDoubleSymbol(Symbol):
         self.symbol2 = symbol2
         self.k2 = 1 if not sub else -1  # Если нужно вычесть второе неизвестное
 
+    def __str__(self):
+        return "%s%s%s%s%s%s%s" % (self.k, "" if self.is_linear else "/", self.symbol,
+                                   format_sign(self.k2), "" if self.is_linear else "/", self.symbol2,
+                                   format_sign(self.y))
+
     def __neg__(self):
         return SuperDoubleSymbol.from_symbol(super().__neg__(), -self.k2, symbol1=self.symbol,
                                              symbol2=self.symbol2)
@@ -310,6 +315,38 @@ class DoubleSymbol(SuperDoubleSymbol):
         # "equations.SuperDoubleSymbol", то есть перенести все данные этого экземпляра
         # И добавляем переменную "z".
         a = DoubleSymbol(self.z, symbol1=obj.symbol, symbol2=obj.symbol2)
+        a.k, a.k2, a.y = obj.k, obj.k2, obj.y
+        return a
+
+
+# Уравнение с двумя неизвстными,
+# В котором есть неизвестные и в правой части
+# Правую часть не нужно указывать в конструкторе класса
+class TwoSidedDoubleSymbol(SuperDoubleSymbol):
+
+    def __init__(self, sub=False, symbol1="x", symbol2="y"):
+        super().__init__(sub=sub, symbol1=symbol1, symbol2=symbol2)
+
+    def __neg__(self):
+        return TwoSidedDoubleSymbol._from_super(super().__neg__())
+
+    def __add__(self, other):
+        return TwoSidedDoubleSymbol._from_super(super().__add__(other))
+
+    def __mul__(self, other):
+        return TwoSidedDoubleSymbol._from_super(super().__mul__(other))
+
+    def __truediv__(self, other):
+        return TwoSidedDoubleSymbol._from_super(super().__truediv__(other))
+
+    def __rtruediv__(self, other):
+        return TwoSidedDoubleSymbol._from_super(super().__rtruediv__(other))
+
+    # Перевести результат работы методов суперкласса в экземпляр
+    # Класса TwoSidedDoubleSymbol
+    @staticmethod
+    def _from_super(obj):
+        a = TwoSidedDoubleSymbol(symbol1=obj.symbol, symbol2=obj.symbol2)
         a.k, a.k2, a.y = obj.k, obj.k2, obj.y
         return a
 
