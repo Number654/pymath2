@@ -110,6 +110,15 @@ class SuperSymbol:
             return a / b
         return f.format_to_mixed_number()
 
+    # Есть ли корни у уравнения
+    # При данной правой части
+    def can_solve(self, z):
+        """ Если коэффициенты неизвестного левой и правой
+        частей не равны, а независимые величины
+        (числа "y") равны в левой и в правой частях,
+        то уравнение не имеет решений. """
+        return not (self.k != z.k and self.y == z.y)
+
     # Решить уравнение
     def get(self, z):
         if isinstance(z, SuperSymbol):  # Перенос слагаемого
@@ -117,7 +126,7 @@ class SuperSymbol:
                 raise ValueError("Unexpected symbol: '%s'" % z.symbol)
             elif self == z:  # Если у уравнения бесконечное количество решений ("x" - любое число)
                 return AnyNumber()
-            elif self != z:  # Если у уравнения нет решений ("x" не равен правой части уравнения)
+            elif not self.can_solve(z):  # Если у уравнения нет решений ("x" не равен правой части уравнения)
                 return
             return ((self.k - z.k) * Symbol(self.symbol)).get(z.y - self.y)
         return "continue"  # Перенос слагаемого не потребовался, решить уравнение
@@ -377,3 +386,27 @@ class EqSystem:
         v1 = new_symbol.get(self.eq2.z)
         v2 = expressed_x.post_symbol(v1)
         return {self.symbol: v2, self.symbol2: v1}
+
+
+class TransferEqSystem:
+
+    """ Система уравнений с возможностью переноса слагаемых.
+       Получает два уравнения с двумя неизвестными,
+       То есть их левую и правую части в кортежах.
+    """
+
+    def __init__(self, para1, para2):
+        self.para1 = para1  # Левая и правая части первого уравнения
+        self.para2 = para2  # Левая и правая часть второго уравнения
+
+    def __str__(self):
+        return " %s=%s\n{\n %s=%s" % (self.para1[0], self.para1[1],
+                                      self.para2[0], self.para2[1])
+
+    def __repr__(self):
+        return str(self.__str__())
+
+    # Решить систему уравнений,
+    # Перенеся неизвестные в левую часть
+    def get(self):
+        pass
