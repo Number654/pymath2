@@ -388,25 +388,81 @@ class EqSystem:
         return {self.symbol: v2, self.symbol2: v1}
 
 
-class TransferEqSystem:
+class TransferEqSystem(EqSystem):
 
-    """ Система уравнений с возможностью переноса слагаемых.
+    """
+       Система уравнений с возможностью переноса слагаемых.
        Получает два уравнения с двумя неизвестными,
        То есть их левую и правую части в кортежах.
     """
 
     def __init__(self, para1, para2):
-        self.para1 = para1  # Левая и правая части первого уравнения
-        self.para2 = para2  # Левая и правая часть второго уравнения
+        super().__init__(para1[0], para2[0])
+        self.para1 = tuple(para1)  # Левая и правая части первого уравнения
+        self.para2 = tuple(para2)  # Левая и правая часть второго уравнения
+
+        # Для удобства, если первым в паре уравнений указано уравнение,
+        # В котором одно неизвестное, такое уравнение перемещается в правую часть.
+        if isinstance(self.para1[0], SuperSymbol) and \
+                not isinstance(self.para1[0], SuperDoubleSymbol):
+            self.para1 = tuple(reversed(self.para1))
+
+        # То же касается и второго уравнения системы
+        if isinstance(self.para2[0], SuperSymbol) and \
+                not isinstance(self.para2[0], SuperDoubleSymbol):
+            self.para2 = tuple(reversed(self.para2))
 
     def __str__(self):
         return " %s=%s\n{\n %s=%s" % (self.para1[0], self.para1[1],
                                       self.para2[0], self.para2[1])
 
-    def __repr__(self):
-        return str(self.__str__())
-
     # Решить систему уравнений,
     # Перенеся неизвестные в левую часть
     def get(self):
-        pass
+        transferred_eq1 = DoubleSymbol(self.para1[1].y-self.para1[0].y,
+                                       symbol1=self.symbol, symbol2=self.symbol2)
+        transferred_eq2 = DoubleSymbol(self.para2[1].y-self.para2[0].y,
+                                       symbol1=self.symbol, symbol2=self.symbol2)
+        # Передаем коэффициенты уравнений в классы для переноса слагаемых
+        transferred_eq1.k = self.para1[0].k
+        transferred_eq1.k2 = self.para1[0].k2
+        transferred_eq2.k = self.para2[0].k
+        transferred_eq2.k2 = self.para2[0].k2
+
+        # Если в первом уравнении в правой части только одно неизвестное
+        if isinstance(self.para1[1], SuperSymbol) and \
+                not isinstance(self.para1[1], SuperDoubleSymbol):
+            # Если неизвестное в правой части совпадает с одним
+            # Из неизвестных в левой части, то вычитаем соответствующие
+            # Коэффициенты
+            if self.para1[0].symbol == self.para1[1].symbol:
+                # Первое неизвестное из левой части совпадает с неизвестным из правой части
+                transferred_eq1.k -= self.para1[1].k
+            elif self.para1[0].symbol2 == self.para1[1].symbol:
+                # Второе неизвестное из левой части совпадает с неизвестным из правой части
+                transferred_eq1.k2 -= self.para1[1].k
+        # Если в первом уравнении в правой части два неизвестных
+        else:
+            # Вычитаем соответствующие коэффициенты
+            transferred_eq1.k -= self.para1[1].k
+            transferred_eq1.k2 -= self.para1[1].k2
+
+        # Если во втором уравнении в правой части только одно неизвестное
+        if isinstance(self.para2[1], SuperSymbol) and \
+                not isinstance(self.para2[1], SuperDoubleSymbol):
+            # Если неизвестное в правой части совпадает с одним
+            # Из неизвестных в левой части, то вычитаем соответствующие
+            # Коэффициенты
+            if self.para2[0].symbol == self.para2[1].symbol:
+                # Первое неизвестное из левой части совпадает с неизвестным из правой части
+                transferred_eq2.k -= self.para2[1].k
+            elif self.para2[0].symbol2 == self.para2[1].symbol:
+                # Второе неизвестное из левой части совпадает с неизвестным из правой части
+                transferred_eq2.k2 -= self.para2[1].k
+        # Если во втором уравнении в правой части два неизвестных
+        else:
+            # Вычитаем соответствующие коэффициенты
+            transferred_eq2.k -= self.para2[1].k
+            transferred_eq2.k2 -= self.para2[1].k2
+
+        return EqSystem(transferred_eq1, transferred_eq2).get()
