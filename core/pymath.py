@@ -44,7 +44,7 @@ def is_evil(num):
         return False
 
 
-# Перемножить все числа (нужно для НОК двух чисел) и в др. ситуациях
+# Перемножить все числа (нужно для НОК двух чисел)
 def multiply_all(_all):
     result = _all[0]
     new_all = list(_all)
@@ -139,7 +139,7 @@ def prime_factorization(num):
     # Чтобы потом записывать их в степени: 125 = 5*5*5 = 5^3
     count = Counter(simple_multiples)
 
-    return [answer, count]
+    return answer, count
 
 
 # Визуализация результата разложения на простые множители,
@@ -207,7 +207,7 @@ def degree_table(degree, _range):
     _range = list(_range)
     result = 'a' + (' ' * (len(str(_range[1])) - 1)) + '|' + ' a^%s\n' % degree
     n = _range[0]
-    while n <= _range[1]:
+    while n <= _range[-1]:
         result += (' ' * (len(str(_range[1])) - len(str(n)))) + str(n) + '|' + ' %s' % n ** degree + '\n'
         n += 1
     return result
