@@ -468,6 +468,8 @@ class Fraction:
 
     # Привидение обыкновенной дроби к десятичному знаменателю
     def to_decimal(self):
+        if not self.is_translatable_to_decimal():
+            raise ValueError("Cannot translate this fraction to decimal")
         fmt = self.format_to_improper_fraction()
         den = 10
         while den % fmt.denominator != 0:
