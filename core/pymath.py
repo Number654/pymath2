@@ -74,7 +74,7 @@ def dividers(num):
     while y <= sqrt(num):
         if num % y == 0:
             my_dividers.append(y)
-            my_dividers.append(num / y)
+            my_dividers.append(num // y)
         y += 1
 
     # Удаляем одинаковые делители (да, и такое бывает)
@@ -114,8 +114,6 @@ def prime_factorization(num):
         pass
     # Начальное число
     thisnum = num
-    # Простые множители
-    simple_multiples = []
     answer = OrderedDict()
     # Пока частное от деления последнего числа на последний простой множитель не будет равен 1 (пока не будет
     # завершено разложение числа на простые множители)
@@ -128,16 +126,14 @@ def prime_factorization(num):
             # Если делитель простое число, то добавляем его в простые делители
             if is_simple(divider):
                 simple_dividers.append(divider)
-            else:
-                pass
         # Добавляем в ответ наибольший из простых делителей (множителей)
         answer[thisnum] = max(simple_dividers)
         # А число делим
-        thisnum /= max(simple_dividers)
+        thisnum //= max(simple_dividers)
 
     # Считаем, сколько одинаковых простых множителей,
     # Чтобы потом записывать их в степени: 125 = 5*5*5 = 5^3
-    count = Counter(simple_multiples)
+    count = Counter([i for i in answer.values()])
 
     return answer, count
 
@@ -161,7 +157,7 @@ def visual_prime_factorization(prime_factorization_result):
     # Получаем числа и простые множителей
     source = prime_factorization_result[0]
     # Отступ (чтобы было как показано выше)
-    indentation = len(str(source.keys()[0]))
+    indentation = len(str(list(source.keys())[0]))
     # Простые множители
     simple_multiples = []
     # Добавляем строчки к результату
@@ -176,7 +172,7 @@ def visual_prime_factorization(prime_factorization_result):
     # Добавляем единичку в конец
     res += ' ' * (indentation - 1) + '1|\n'
     # Делаем итоговую строку
-    final_string = '%s = ' % source.keys()[0]
+    final_string = '%s = ' % list(source.keys())[0]
     for i in prime_factorization_result[1]:
         # Добавляем к итоговой строке множители
         # Записываем так: простой множитель^количество таких же * следующая запись
