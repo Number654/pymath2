@@ -179,8 +179,6 @@ class Fraction:
             self.fraction = float2ordinary(fraction).fraction
         elif isinstance(fraction, int):
             self.fraction = int2fraction(fraction).fraction
-        elif isinstance(fraction, Double):
-            self.fraction = fraction.fraction  # Можно передать в конструктор экземпляр класса Double
         else:
             if fraction.isdigit():
                 self.fraction = int2fraction(int(fraction)).fraction
@@ -381,6 +379,10 @@ class Fraction:
     def __ge__(self, other):
         return self.__compare(other, ">=")
 
+    # Отсечь дробную часть и вернуть int
+    def __int__(self):
+        return self.integer_part
+
     # Общий алгоритм сравнения дробей, нужно лишь указать нужный операнд сравнения
     def __compare(self, other, cmp_sign):
         common = reduce_to_common_denominator([self, to_fraction(other)])  # Привести к общему знаменателю
@@ -561,7 +563,7 @@ class LiteralFraction:
 
 
 # Числа с плавающей точкой неограниченной точности
-class Double(Fraction):
+class Double:
 
     def __init__(self, double):
         # Передаем только строки.
@@ -569,33 +571,42 @@ class Double(Fraction):
         if not isinstance(double, str):
             raise ValueError("'Double' class supports only 'str' values")
 
-        self.double = double  # Десятичное представление
-        x = double.split(".")
+        self.int_part = double.split(".")[0]  # Целая часть
+        self.fraction_part = double.split(".")[1]  # Дробная часть
 
-        # С целой частью
-        if int(x[0]):
-            super().__init__("%s&%s/%s" % (x[0], x[1], 10 ** len(x[1])))
-        # Без целой части
-        else:
-            super().__init__("%s/%s" % (x[1], 10 ** len(x[1])))
+        while self.fraction_part[-1] == "0" and self.fraction_part != "0":  # Убираем лишние нули в конце дробной части
+            self.fraction_part = self.fraction_part.removesuffix("0")
+        self.double = self.int_part+"."+self.fraction_part  # Формируем строку с десятичной дробью
 
     def __str__(self):
-        # Дело в том, что из-за того, что данный класс основан на классе
-        # Обыкновенных дробей, после выполнения арифметических действий в ответ "вылазит"
-        # Обыкновенная дробь, которую нужно перевести в десятичный вид
-        return Double.from_fraction(self).double
+        return self.double
 
     def __repr__(self):
-        return str(Double.from_fraction(self).double)
+        return str(self.__str__())
 
     # Поменять знак числа
     def __neg__(self):
-        return Double.from_fraction(super(Double, self).__neg__())
+        return Double("-"+self.double) if self.double[0] != "-" else Double(self.double[1:])
 
     # Сложение
     # Просто переводим тип Fraction в тип Double
     def __add__(self, other):
-        return Double.from_fraction(super(Double, self).__add__(other))
+        if isinstance(other, Fraction):
+            return self.__add__(Double.from_fraction(other))
+
+        fr1 = self.fraction_part  # Дробная часть этой десятичной дроби
+        fr2 = other.fraction_part  # Дробная часть другой десятичной дроби
+        fr1_len = len(fr1)
+        fr2_len = len(fr2)
+
+        if fr1_len < fr2_len:  # Если дробная часть этой дроби короче, чем у дрогой
+            fr1 += "0" * (fr2_len-fr1_len)
+        elif fr1_len > fr2_len:
+            fr2 += "0" * (fr1_len-fr2_len)
+
+        _sum = str(int(self.int_part+fr1) + int(other.int_part+fr2))
+        result = Double("%s.%s" % (_sum[:len(_sum)-len(fr1)], _sum[len(_sum)-len(fr1):]))
+        return result
 
     # Сложение с присваиванием
     def __iadd__(self, other):
@@ -607,7 +618,7 @@ class Double(Fraction):
 
     # Вычитание
     def __sub__(self, other):
-        return Double.from_fraction(super(Double, self).__sub__(other))
+        return self.__add__(-other)
 
     # Вычитание с присваиванием
     def __isub__(self, other):
@@ -616,7 +627,7 @@ class Double(Fraction):
 
     # Вычесть из другого числа Double
     def __rsub__(self, other):
-        return Double.from_fraction(super(Double, self).__rsub__(other))
+        return -self.__add__(other)
 
     # Умножение
     def __mul__(self, other):
@@ -665,13 +676,17 @@ class Double(Fraction):
         self.assign(self.__mod__(other))
         return self
 
-    # Остаток от деления на дробь Double
+    # Остаток от деления на Double
     def __rmod__(self, other):
         return Double.from_fraction(super(Double, self).__rmod__(other))
 
     # Модуль Double
     def __abs__(self):
         return Double.from_fraction(super(Double, self).__abs__())
+
+    # Отсечь дробную часть и вернуть int
+    def __int__(self):
+        return self.int_part
 
     # Перевести тип Fraction в тип Double
     @staticmethod
@@ -683,7 +698,7 @@ class Double(Fraction):
         elif isinstance(f, float):
             return Double(str(f))
 
-        f = f.to_decimal()
+        f = f.to_decimal().format_to_mixed_number()
         if f.integer_part:
             integer_part = f.integer_part
         else:
@@ -699,50 +714,24 @@ class Double(Fraction):
         return self
 
     # Округление дроби
-    def round(self, accuracy=1.0):
-        decimal_fraction = self.double
-        # Округление с точностью до единиц
-        if accuracy == 1.0:
-            intpart = int(str(decimal_fraction).split(".")[0])
-            # Если первая цифра дробной части >= 5, то увеличиваем целую часть на 1
-            if int(str(decimal_fraction).split(".")[1][0]) >= 5:
-                intpart += 1
-            # Возвращаем целую часть, дробную часть заменяем нулем
-            return float(intpart)
-        # Если округлять нужно не до единиц, то делаем следующее:
-        else:
-            # Получаем целую часть
-            integer_part = str(decimal_fraction).split('.')[0]
-            # Получаем дробную часть
-            fraction_part = str(decimal_fraction).split('.')[1]
-            # Получаем разряд, с точностью до которого нужно округлять
-            digit = str(accuracy).split('.')[1]
-            # И если цифра после этого разряда >= 5, то указываем, что цифра округляемого разряда
-            # Должна быть увеличена на 1
-            if int(fraction_part[len(digit)]) >= 5:
-                add = Double(str(accuracy))
-            # Иначе увеличиваем на 0.0
-            else:
-                add = Double("0.0")
-            """
-            Округлить 15.2531 с точностью до десятых.
-             15.2531
-            + 0.0100
-            --------
-             15.3"""
-            # Увеличиваем!
-            summa = self + add
-            # Берем только цифры до округляемого разряда (вкл. сам разряд), так как все остальное - нули
-            ost = str(summa).split('.')[1][:len(digit)]
-
-            return Double('%s.' % integer_part + ost)
+    def round(self, accuracy=0):
+        if accuracy < 0:  # Алгоритм округления целой части
+            if int(self.int_part[::-1][abs(accuracy)-1]) >= 5:
+                return Double("%s.0" % (int(self.int_part[:accuracy]+"0"*abs(accuracy))+10**abs(accuracy)))
+            return Double("%s.0" % (self.int_part[:accuracy]+"0"*abs(accuracy)))
+        elif accuracy > 0:  # Алгоритм округления дробной части
+            if int(self.fraction_part[accuracy]) >= 5:
+                return Double(self.double[:len(self.int_part)+accuracy+1]) + \
+                       Double("0.%s" % ("0"*(accuracy-1)+"1"))
+            return Double(self.double[:len(self.int_part)+accuracy+1])
+        elif accuracy == 0:  # Алгоритм округления до единиц
+            if int(self.fraction_part[0]) >= 5:
+                return Double("%s.0" % (int(self.int_part)+1))
+            return Double("%s.0" % self.int_part)
 
     # Алгоритм присваивания
-    # Тут все как с обыкновенными дробями, только присваивается
-    # Дополнительно десятичный вид: self.double
     def assign(self, m):
-        super(Double, self).assign(m)
-        self.double = m.double
+        self.__init__(m.double)
 
 
 # Периодическая дробь
