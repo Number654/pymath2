@@ -422,13 +422,18 @@ class Fraction:
 
     # Метод переведения дроби из смешанного числа в неправильную дробь
     def format_to_improper_fraction(self):
+        # Числитель неправильной дроби: знаменатель * цел.ч + числитель (смешанного числа)
+        # Возвращает новый экземпляр класса Fraction
         if self.is_improper():
             return self
         if self.is_typical():
             return self
-        # Числитель неправильной дроби: знаменатель * цел.ч + числитель (смешанного числа)
-        # Возвращает новый экземпляр класса Fraction
-        return Fraction('%s/%s' % (self.denominator * self.integer_part + self.numerator, self.denominator))
+
+        if self.integer_part < 0:  # Если данная дробь является отрицательным смешанным числом,
+            # То переводим модуль данной дроби, а затем делаем результат отрицательным
+            fmt = abs(self)
+            return Fraction('-%s/%s' % (fmt.denominator * fmt.integer_part + fmt.numerator, fmt.denominator))
+        return Fraction("%s/%s" % (self.denominator * self.integer_part + self.numerator, self.denominator))
 
     # Переведение неправильной дроби в смешанное число
     def format_to_mixed_number(self):
@@ -472,11 +477,13 @@ class Fraction:
     def to_decimal(self):
         if not self.is_translatable_to_decimal():
             raise ValueError("Cannot translate this fraction to decimal")
-        fmt = self.format_to_improper_fraction()
+        fmt = abs(self).format_to_improper_fraction()  # Убираем минус у переводимой дроби для удобства
         den = 10
-        while den % fmt.denominator != 0:
+        while den % self.denominator:
             den *= 10
-        return Fraction("%s/%s" % (fmt.numerator * (int(den / fmt.denominator)), den))
+        if self < 0:  # Возвращаем минус, если переводимая дробь была отриуательной
+            return Fraction("%s/%s" % (-fmt.numerator * (den // fmt.denominator), den))
+        return Fraction("%s/%s" % (fmt.numerator * (den // fmt.denominator), den))
 
     # Проверка дроби на переводимость в конечную десятичную
     def is_translatable_to_decimal(self):
@@ -574,6 +581,14 @@ class Double:
         self.int_part = double.split(".")[0]  # Целая часть
         self.fraction_part = double.split(".")[1]  # Дробная часть
 
+        if self.int_part == "":
+            self.int_part = "0"
+        if self.int_part == "-":
+            self.int_part = "-0"
+
+        if self.fraction_part == "":
+            self.fraction_part = "0"
+
         while self.fraction_part[-1] == "0" and self.fraction_part != "0":  # Убираем лишние нули в конце дробной части
             self.fraction_part = self.fraction_part.removesuffix("0")
         self.double = self.int_part+"."+self.fraction_part  # Формируем строку с десятичной дробью
@@ -591,7 +606,7 @@ class Double:
     # Сложение
     # Просто переводим тип Fraction в тип Double
     def __add__(self, other):
-        if isinstance(other, Fraction):
+        if not isinstance(other, Double):
             return self.__add__(Double.from_fraction(other))
 
         fr1 = self.fraction_part  # Дробная часть этой десятичной дроби
@@ -631,7 +646,13 @@ class Double:
 
     # Умножение
     def __mul__(self, other):
-        return Double.from_fraction(super(Double, self).__mul__(other))
+        if not isinstance(other, Double):
+            return self.__mul__(Double.from_fraction(other))
+
+        move_point = len(self.fraction_part) + len(other.fraction_part)  # На сколько знаков нужно двигать запятую
+        _mul = str(int(self.double.replace(".", ""))*int(other.double.replace(".", "")))
+        result = Double("%s.%s" % (_mul[:len(_mul)-move_point], _mul[len(_mul)-move_point:]))
+        return result
 
     # Умножение с присваиванием
     def __imul__(self, other):
@@ -643,7 +664,15 @@ class Double:
 
     # Деление
     def __truediv__(self, other):
-        return Double.from_fraction(super(Double, self).__truediv__(other))
+        if not isinstance(other, Double):
+            return self.__truediv__(Double.from_fraction(other))
+
+        # Переводим эту десятичную дробь и другоую в обыкновенные
+        f1 = Fraction("%s&%s/%s" % (self.int_part, self.fraction_part, 10**len(self.fraction_part))).reduce()
+        f2 = Fraction("%s&%s/%s" % (other.int_part, other.fraction_part, 10**len(other.fraction_part))).reduce()
+        _div = (f1 / f2).reduce().format_to_mixed_number()  # И делим их, после переводим обратно в тип Double,
+        # Если это возможно
+        return _div if not _div.is_translatable_to_decimal() else Double.from_fraction(_div.to_decimal())
 
     # Деление с присваиванием
     def __itruediv__(self, other):
@@ -697,12 +726,18 @@ class Double:
             return Double("%s.0" % f)
         elif isinstance(f, float):
             return Double(str(f))
+        elif type(f) not in (Double, Fraction, int, float):
+            raise TypeError("Cannot convert '%s' to 'Double'" % type(f))
 
         f = f.to_decimal().format_to_mixed_number()
         if f.integer_part:
             integer_part = f.integer_part
         else:
-            integer_part = 0
+            if f < 0:  # Если дробь, которую следует перевести в Double является отрицательной без целой части
+                integer_part = "-0"
+                f.numerator = abs(f.numerator)  # Чтобы минус из числителя не стоял после точки в десятичной дроби
+            else:
+                integer_part = "0"
 
         # Тут подставляем число нулей после запятой до числителя, равное разности длины знаменателя, 1 и длины
         # Числителя
