@@ -315,11 +315,11 @@ class Fraction:
     # Возведение в степень
     # Чтобы возвести дробь в степень, нужно возвести в степень ее числитель и знаменатель
     def __pow__(self, power):
-        if isinstance(power, Fraction):
+        if isinstance(power, Fraction) or isinstance(power, Double):
             raise TypeError("'Fraction' does not support fractional exponentiation")
         m = self.format_to_improper_fraction()
-        mf = Fraction("%s/%s" % (m.numerator ** power, m.denominator ** power))
-        return mf.format_to_mixed_number()
+        mf = Fraction("%s/%s" % (pow(m.numerator, power), pow(m.denominator, power)))
+        return mf.reduce().format_to_mixed_number()
 
     # Возведение в степень с присваиванием
     def __ipow__(self, power):
@@ -330,7 +330,7 @@ class Fraction:
     # Возведение другого числа в дробную степень
     def __rpow__(self, power):
         a = self.format_to_improper_fraction()
-        return root(power**a.numerator, a.denominator)
+        return root(pow(power, a.numerator), a.denominator)
 
     # Остаток от деления дроби на другое значение
     def __mod__(self, other):
@@ -442,10 +442,9 @@ class Fraction:
         if self.is_typical():
             return self
         # Иначе делим числитель на знаменатель - это целая часть, остаток от деления - числитель смеш. числа
-        # Если остатка нет, то возвращаем тип int
         dvmd = better_divmod(self.numerator, self.denominator)
         if not dvmd[1]:
-            return dvmd[0]
+            return Fraction("%s&0/1" % dvmd[0] if not self < 0 else -dvmd[0])
         else:
             return Fraction('%s&%s/%s' % (dvmd[0], dvmd[1], self.denominator))
 
@@ -681,11 +680,19 @@ class Double:
 
     # Разделить другое число на Double
     def __rtruediv__(self, other):
-        return Double.from_fraction(super(Double, self).__rtruediv__(other))
+        if not isinstance(other, Double):
+            return self.__rtruediv__(Double.from_fraction(other))
+        return other.__truediv__(self)
 
     # Возведение в степень
     def __pow__(self, power):
-        return Double.from_fraction(super(Double, self).__pow__(power))
+        if isinstance(power, Fraction) or isinstance(power, Double):
+            raise TypeError("'Double' does not support fractional exponentiation")
+
+        # Переводим эту десятичную дробь в обыкновенную
+        f = Fraction("%s&%s/%s" % (self.int_part, self.fraction_part, 10**len(self.fraction_part))).reduce()
+        _pow = f**power
+        return _pow if not _pow.is_translatable_to_decimal() else Double.from_fraction(_pow.to_decimal())
 
     # Возведение в степень с присваиванием
     def __ipow__(self, power):
