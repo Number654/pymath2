@@ -444,9 +444,8 @@ class Fraction:
         # Иначе делим числитель на знаменатель - это целая часть, остаток от деления - числитель смеш. числа
         dvmd = better_divmod(self.numerator, self.denominator)
         if not dvmd[1]:
-            return Fraction("%s&0/1" % dvmd[0] if not self < 0 else -dvmd[0])
-        else:
-            return Fraction('%s&%s/%s' % (dvmd[0], dvmd[1], self.denominator))
+            return Fraction("%s&0/1" % dvmd[0])
+        return Fraction('%s&%s/%s' % (dvmd[0], dvmd[1], self.denominator))
 
     # Сокращение дроби
     def reduce(self):
