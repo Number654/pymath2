@@ -187,19 +187,24 @@ class Fraction:
             else:
                 self.fraction = str(fraction)
 
+        int_and_fr = self.fraction.split("&")  # Целая и дробная части
+        num_and_den = int_and_fr[-1].split("/")  # Числитель и знаменатель
+        self.integer_part = int_and_fr[0]  # Целая часть
+
         # Проверка на смешанное число
         # Если это смешанное число, то берем и целую часть
         if self.is_mixed_number():
-            self.integer_part = int(self.fraction.split('&')[0])
-            # Числитель со знаменателем
-            self.numerator = int(str(self.fraction.split('&')[1]).split('/')[0])
-            self.denominator = int(str(self.fraction.split('&')[1]).split('/')[1])
+            if self.integer_part == "-0":
+                num_and_den = ["-"+num_and_den[0], num_and_den[1]]
+            self.integer_part = int(self.integer_part)
         else:
-            # Числитель со знаменателем
-            self.numerator = int(self.fraction.split('/')[0])
-            self.denominator = int(self.fraction.split('/')[1])
             self.integer_part = 0
 
+        # Числитель и знаменатель
+        self.numerator = int(num_and_den[0])
+        self.denominator = int(num_and_den[1])
+
+        self.update_fraction()
         self.assign(self.format_sign())  # Упрощаем запись дроби со знаком
 
     # Когда пишем: print(fraction) - выводим на экран дробь
@@ -300,7 +305,7 @@ class Fraction:
 
     # Целочисленное деление
     def __floordiv__(self, other):
-        return trunc(self / other)
+        return to_fraction(trunc(self / other))
 
     # Целочисленнное деление с присваиваением
     def __ifloordiv__(self, other):
@@ -310,7 +315,7 @@ class Fraction:
 
     # Целочисленное деление на дробь
     def __rfloordiv__(self, other):
-        return trunc(other / self)
+        return to_fraction(trunc(other / self))
 
     # Возведение в степень
     # Чтобы возвести дробь в степень, нужно возвести в степень ее числитель и знаменатель
@@ -334,7 +339,7 @@ class Fraction:
 
     # Остаток от деления дроби на другое значение
     def __mod__(self, other):
-        return (self / other) - (self // other)
+        return to_fraction(abs(self - other*(self // other)))
 
     # Остаток от деления с присваиванием
     def __imod__(self, other):
@@ -344,11 +349,11 @@ class Fraction:
 
     # Остаток от деления другого значения на дробь
     def __rmod__(self, other):
-        return (other / self) - (other // self)
+        return to_fraction(abs(other - self*(other // self)))
 
     # Отсечение дробной части
     def __trunc__(self):
-        return self.integer_part
+        return to_fraction(self.integer_part)
 
     # Модуль дроби
     def __abs__(self):
@@ -683,6 +688,22 @@ class Double:
             return self.__rtruediv__(Double.from_fraction(other))
         return other.__truediv__(self)
 
+    # Целочисленное деление
+    def __floordiv__(self, other):
+        return Double.from_fraction(trunc(self / other))
+
+    # Целочисленное деление с присваиванием
+    def __ifloordiv__(self, other):
+        self.assign(self.__floordiv__(other))
+        return self
+
+    # Целочисленное деление на тип Double
+    def __rfloordiv__(self, other):
+        return Double.from_fraction(trunc(other / self))
+
+    def __trunc__(self):
+        return Double("%s.0" % self.int_part)
+
     # Возведение в степень
     def __pow__(self, power):
         if isinstance(power, Fraction) or isinstance(power, Double):
@@ -690,7 +711,7 @@ class Double:
 
         # Переводим эту десятичную дробь в обыкновенную
         f = Fraction("%s&%s/%s" % (self.int_part, self.fraction_part, 10**len(self.fraction_part))).reduce()
-        _pow = f**power
+        _pow = pow(f, power)
         return _pow if not _pow.is_translatable_to_decimal() else Double.from_fraction(_pow.to_decimal())
 
     # Возведение в степень с присваиванием
@@ -698,13 +719,9 @@ class Double:
         self.assign(self.__pow__(power))
         return self
 
-    # Возвести число в степень типа Double
-    def __rpow__(self, other):
-        return Double.from_fraction(super(Double, self).__rpow__(other))
-
     # Остаток от деления
     def __mod__(self, other):
-        return Double.from_fraction(super(Double, self).__mod__(other))
+        return Double.from_fraction(abs(self - other*(self // other)))
 
     # Остаток от деления с присваиванием
     def __imod__(self, other):
@@ -713,11 +730,11 @@ class Double:
 
     # Остаток от деления на Double
     def __rmod__(self, other):
-        return Double.from_fraction(super(Double, self).__rmod__(other))
+        return Double.from_fraction(abs(other - self*(other // self)))
 
     # Модуль Double
     def __abs__(self):
-        return Double.from_fraction(super(Double, self).__abs__())
+        return Double("%s.%s" % (abs(int(self.int_part)), self.fraction_part))
 
     # Отсечь дробную часть и вернуть int
     def __int__(self):
@@ -772,7 +789,7 @@ class Double:
 
     # Алгоритм присваивания
     def assign(self, m):
-        self.__init__(m.double)
+        self.__init__(Double.from_fraction(m).double)
 
 
 # Периодическая дробь
