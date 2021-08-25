@@ -1,6 +1,6 @@
 # -*- coding: utf-8
 
-from .pymath import gcd, lcm, prime_factorization, better_divmod, root, trunc
+from .pymath import is_odd, gcd, lcm, prime_factorization, better_divmod, root, trunc
 
 
 # Является ли сторка числом с плавающей точкой?
@@ -595,6 +595,7 @@ class Double:
         while self.fraction_part[-1] == "0" and self.fraction_part != "0":  # Убираем лишние нули в конце дробной части
             self.fraction_part = self.fraction_part.removesuffix("0")
         self.double = self.int_part+"."+self.fraction_part  # Формируем строку с десятичной дробью
+        self.format_sign()  # Упрощаем знак десятичной дроби
 
     def __str__(self):
         return self.double
@@ -734,11 +735,45 @@ class Double:
 
     # Модуль Double
     def __abs__(self):
-        return Double("%s.%s" % (abs(int(self.int_part)), self.fraction_part))
+        return Double(self.double.replace("-", ""))
+
+    # ==
+    def __eq__(self, other):
+        return self.__compare(other) == 0
+
+    # !=
+    def __ne__(self, other):
+        return self.__compare(other) != 0
+
+    # <
+    def __lt__(self, other):
+        return self.__compare(other) < 0
+
+    # >
+    def __gt__(self, other):
+        return self.__compare(other) > 0
+
+    # <=
+    def __le__(self, other):
+        return self.__compare(other) <= 0
+
+    # >=
+    def __ge__(self, other):
+        return self.__compare(other) >= 0
+
+    # Вычитаем из этой дроби другую
+    # Потом сравниваем результат с нулем - это используется
+    # Во всех методах, относящихся к операндам сравнения
+    def __compare(self, other):
+        return float(self - other)
 
     # Отсечь дробную часть и вернуть int
     def __int__(self):
         return self.int_part
+
+    # Перевести Double в тип float (возможна потеря точности)
+    def __float__(self):
+        return float(self.double)
 
     # Перевести тип Fraction в тип Double
     @staticmethod
@@ -767,6 +802,15 @@ class Double:
         return Double("%s.%s" % (integer_part, "0" *
                                  (len(str(f.denominator))-1 - len(str(f.numerator))) +
                                  str(f.numerator)))
+
+    # Упростить знак Double
+    # Если в конструктор передана десятичная дробь с четным количеством минусов,
+    # То дробь будет положительной, иначе - отрицательной
+    def format_sign(self):
+        if not is_odd(self.double.count("-")):
+            self.double = self.double.replace("-", "")
+        else:
+            self.double = "-"+(self.double.replace("-", ""))
 
     def to_decimal(self):
         return self
