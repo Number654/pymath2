@@ -18,7 +18,7 @@ def int2fraction(integer):
     return Fraction('%s/1' % integer)
 
 
-# Число с плавающей точкой в десятичную дробь
+# Число с плавающей точкой в обыкновенную дробь
 def float2ordinary(_float):
     string = repr(_float)
     splitted = string.split('.')
