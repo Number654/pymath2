@@ -146,8 +146,7 @@ def solve_fraction_expr(expr):
     expression = ""  # Здесь будет составленное выражение для вычисления
 
     for something in fractions_and_operands:
-        # Если "что-то" имеет длину в 1 символ, то это знак действия
-        if len(something) == 1:
+        if something in ["+", "-", "*", "/", "//", "**", "%"]:
             expression += something
 
         # Дроби и скобки
@@ -160,9 +159,6 @@ def solve_fraction_expr(expr):
             elif something[-1] == ")":
                 # В дробь попадает все, что идет до закр. скобки
                 expression += "Fraction('%s'))" % something.split(")")[0]
-            # Знак возведения в степень
-            elif something == "**":
-                expression += something
             # Просто дробь
             else:
                 expression += "Fraction('%s')" % something
