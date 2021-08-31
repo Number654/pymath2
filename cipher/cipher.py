@@ -172,6 +172,9 @@ class AtbashCipher:
         self.alphabet = _alphabet
         self.alphabet_reversed = _alphabet.get_reversed()
 
+    def to_string(self):
+        return self.data
+
     def encrypt(self):
         encrypted = """"""
         al = self.alphabet.get_array()
@@ -204,9 +207,9 @@ class EnigmaCipher:
     def __init__(self, data, rotor1="A", rotor2="B", rotor3="C"):
         self.data = data.upper()
 
-        self.rotor1 = latin_capital.index(rotor1)
-        self.rotor2 = latin_capital.index(rotor2)
-        self.rotor3 = latin_capital.index(rotor3)
+        self.rotor1 = latin_capital.index(rotor1.upper())
+        self.rotor2 = latin_capital.index(rotor2.upper())
+        self.rotor3 = latin_capital.index(rotor3.upper())
 
         self.rotor1_combinations = [
             ["E", "A"],

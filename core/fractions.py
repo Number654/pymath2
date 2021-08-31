@@ -780,7 +780,7 @@ class Double:
             return Double("%s.0" % f)
         elif isinstance(f, float):
             return Double(str(f))
-        elif type(f) not in (Double, Fraction, int, float):
+        elif type(f) not in (Double, Fraction, int, float):  # Нет возможности перевести этот тип
             raise TypeError("Cannot convert '%s' to 'Double'" % type(f))
 
         f = f.to_decimal().format_to_mixed_number()
