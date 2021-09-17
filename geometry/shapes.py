@@ -167,8 +167,11 @@ class IrregularPolygon(Shape, ABC):
     name = "irregular_polygon"
 
     def __init__(self, points):
-        self.points = [Segment(v[0], points[i][0],
-                               v[1], points[i][1]) for i, v in enumerate(points[:-1], start=1)]
+        self.points = [Segment(v[0], points[i+1][0],
+                               v[1],
+                               points[i+1][1]) for i, v in enumerate(points[:-1])]
+        self.points.append(Segment(points[-2][0], points[-1][0],
+                                   points[-2][1], points[-1][1]))
         super().__init__(None, None)
 
     def area(self):
