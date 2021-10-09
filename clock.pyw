@@ -76,11 +76,18 @@ class Clock:
 
     # Запустить процесс хода разогнанных часов
     def overclock(self):
-        # Теперь разогнать часы нельзя, и нужно перезагрузить приложение, чтобы вернуться в обычный режим
-        self.overclock_button.config(text="RESTART TO VIEW REAL TIME", state="disabled")
+        # Теперь кнопка служит для прехода часов в обычный режим
+        self.overclock_button.config(text="STOP OVERCLOCKING", command=self.stop_overclocking)
         self.tk.after_cancel(self.tk.after_id)  # Остановить процесс хода обычных часов
         self.tk.after_idle(self.overclock_process)
         self.saved_time = [int(v) for v in time.strftime("%H:%M:%S").split(":")]  # Получаем текущее время и сохраняем
+
+    # Остановить разгон
+    def stop_overclocking(self):
+        # Кнопка снова служит для разгона часов
+        self.overclock_button.config(text="OVERCLOCK(SPEED x66.7)", command=self.overclock)
+        self.tk.after_cancel(self.tk.after_id)  # Остановить процесс разгона
+        self.tk.after_idle(self.time_process)
 
     # Процесс хода разогнанных часов
     def overclock_process(self):
@@ -97,7 +104,7 @@ class Clock:
         if self.saved_time[0] == 24:
             self.saved_time[0] = 0
 
-        self.tk.after(15, self.overclock_process)  # Минута идет со скоростью секунды
+        self.tk.after_id = self.tk.after(15, self.overclock_process)  # Минута идет со скоростью секунды
         self.set_time("%.2d:%.2d:%.2d" % tuple(self.saved_time))
 
     # Процесс хода часов
