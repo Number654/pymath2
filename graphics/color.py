@@ -109,8 +109,8 @@ class ColorWidget:
 def main():
     tk = Tk()
 
-    cwg = ColorWidget(tk, 10, 10, 88, 95)
-    cwg.place()
+    cwg = ColorWidget(tk, 91, 95)
+    cwg.place(10, 10)
     cwg.enable_fill()
 
     tk.mainloop()

@@ -3,15 +3,18 @@
 from tkinter import IntVar, TclError
 from tkinter.ttk import Radiobutton
 from time import sleep
+from core import better_divmod
 from graphics.graphics_canvas import *
 from graphics.cellsize import *
 from graphics.color import *
 from graphics.text import *
+from graphics.shape_mgr import *
+
 
 # Окно
 tk = Tk()
 tk.title('Graphics')
-tk.geometry("730x460")
+tk.geometry("910x460")
 tk.resizable(0, 0)
 
 # Переменная для установки режима рисования с точностью до пикселей
@@ -36,6 +39,9 @@ cwg.place(x=625, y=21)
 cwg.enable_fill()
 
 csw.place(x=625, y=121)
+
+shape_mgr = ShapeManager(tk, canvas)
+shape_mgr.place(730, 20)
 
 tsr = TextSpawner(tk, canvas)
 spawn_text_button = Button(tk, text='Вставка текста', width=14, command=tsr.spawn)
@@ -92,8 +98,8 @@ while canvas.is_running:
     pointer = canvas.get_mouse_pos()
     coordinates_text['text'] = "X: %s Y: %s  |  X: %s кл. Y: %s кл." % \
                                (pointer[0], pointer[1],
-                                int(divmod(pointer[0], canvas.cell_size_wid.get())[0]),
-                                int(divmod(canvas.height - pointer[1], canvas.cell_size_wid.get())[0]))
+                                int(better_divmod(pointer[0], canvas.cell_size_wid.get())[0]),
+                                int(better_divmod(canvas.height - pointer[1], canvas.cell_size_wid.get())[0]))
 
     # Если количество фигур на холсте больше нуля, то включаем
     # Кнопку "отмена", ведь теперь можно убрать последнюю нарисованную
@@ -164,6 +170,6 @@ while canvas.is_running:
             pass
         del mouse_pos
 
-    sleep(0.01)
+    sleep(0.001)
     tk.update_idletasks()
     tk.update()
