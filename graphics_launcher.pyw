@@ -9,6 +9,7 @@ from graphics.cellsize import *
 from graphics.color import *
 from graphics.text import *
 from graphics.shape_mgr import *
+from graphics.shape_selector import ShapeSelector
 
 
 # Окно
@@ -22,6 +23,9 @@ pixel_mode = IntVar()
 
 csw = CellSizeWidget(tk, 94, 68)
 cwg = ColorWidget(tk, 94, 95)
+
+shape_selector = ShapeSelector(tk, )
+shape_selector.place(x=625, y=385)
 
 undo_redo_frame = Frame(tk, width=94, height=55, relief=GROOVE, bd=2)
 undo_redo_frame.place(x=625, y=194)
@@ -43,10 +47,6 @@ csw.place(x=625, y=121)
 shape_mgr = ShapeManager(tk, canvas)
 shape_mgr.place(730, 20)
 
-tsr = TextSpawner(tk, canvas)
-spawn_text_button = Button(tk, text='Вставка текста', width=14, command=tsr.spawn)
-spawn_text_button.place(x=625, y=323)
-
 # Кнопки экспорта, импорта, сохраниния изменений рисунка
 export_image_button = Button(tk, text='Экспорт...', width=12, command=canvas.save)
 import_image_button = Button(tk, text='Импорт...', width=12, command=canvas.load)
@@ -67,9 +67,18 @@ cell_accuracy_mode_radiobtn.place(x=7, y=20)
 pixel_accuracy_mode_radiobtn = Radiobutton(drawing_accuracy_frame, text="Пикселям", variable=pixel_mode, value=1)
 pixel_accuracy_mode_radiobtn.place(x=7, y=40)
 
+
+two_buttons_frame = Frame(tk, width=94, height=55, bd=2, relief="groove")
+two_buttons_frame.place(x=625, y=325)
+
 # Кнопка очистки холста
-clear_canvas_button = Button(tk, text="Очистить", width=14, command=canvas.clear_all_command)
-clear_canvas_button.place(x=625, y=350)
+clear_canvas_button = Button(two_buttons_frame, text="Очистить", width=13, command=canvas.clear_all_command)
+clear_canvas_button.place(x=1, y=0)
+
+# Кнопка для всавки текста
+tsr = TextSpawner(tk, canvas)
+spawn_text_button = Button(two_buttons_frame, text='Вставка текста', width=13, command=tsr.spawn)
+spawn_text_button.place(x=1, y=25)
 
 
 # Текст для отображения текущего положения курсора
