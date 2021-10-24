@@ -18,9 +18,9 @@ class ShapeSelector:
         self.frame = Frame(self.master, width=94, height=32, bd=2, relief="groove")
         self.line_btn = Radiobutton(self.frame, text="▬", indicatoron=0, font="Tahoma 10",
                                     variable=self.choice, value=0)
-        self.rect_btn = Radiobutton(self.frame, text="█", indicatoron=0, font="Tahoma 10",
+        self.rect_btn = Radiobutton(self.frame, text="◼", indicatoron=0, font="Tahoma 10",
                                     variable=self.choice, value=1)
-        self.circle_btn = Radiobutton(self.frame, text="●", indicatoron=0, font="Tahoma 10",
+        self.circle_btn = Radiobutton(self.frame, text="⬤", indicatoron=0, font="Tahoma 10",
                                       variable=self.choice, value=2)
         self.stop_btn = Radiobutton(self.frame, text="N", indicatoron=0, font="Times 10 bold",
                                     variable=self.choice, value=-1)
@@ -30,7 +30,7 @@ class ShapeSelector:
         self.line_btn.place(x=1, y=0)
         self.rect_btn.place(x=26, y=0)
         self.circle_btn.place(x=48, y=0)
-        self.stop_btn.place(x=69, y=0)
+        self.stop_btn.place(x=70, y=0)
 
     def get(self):
         return self.choice.get()

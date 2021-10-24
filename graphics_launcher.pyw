@@ -85,17 +85,8 @@ spawn_text_button.place(x=1, y=25)
 coordinates_text = Label(tk)
 coordinates_text.place(x=19, y=420)
 
-tk.bind_all("<KeyPress-Control_L>", lambda event: canvas.set_drawing_by_mouse(event, "line"))
-tk.bind_all("<KeyRelease-Control_L>", canvas.unset_drawing_by_mouse)
-
-tk.bind_all("<KeyPress-Shift_L>", lambda event: canvas.set_drawing_by_mouse(event, "rectangle"))
-tk.bind_all("<KeyRelease-Shift_L>", canvas.unset_drawing_by_mouse)
-
-tk.bind_all("<KeyPress-Alt_L>", lambda event: canvas.set_drawing_by_mouse(event, "circle"))
-tk.bind_all("<KeyRelease-Alt_L>", canvas.unset_drawing_by_mouse)
-
-tk.bind_all("<Button-1>", canvas.start_drawing_by_mouse)
-tk.bind_all("<ButtonRelease-1>", canvas.stop_drawing_by_mouse)
+tk.bind_all("<ButtonPress-1>", lambda event: canvas.start_drawing_by_mouse(event, shape_selector.get()))
+tk.bind_all("<ButtonRelease-1>", lambda event: canvas.stop_drawing_by_mouse(event, shape_selector.get()))
 
 tk.protocol("WM_DELETE_WINDOW", canvas.quit)
 
@@ -105,10 +96,12 @@ while canvas.is_running:
 
     # Выводим на экран текущую позицию курсора мыши в пикселях и клетках
     pointer = canvas.get_mouse_pos()
-    coordinates_text['text'] = "X: %s Y: %s  |  X: %s кл. Y: %s кл." % \
+    coordinates_text['text'] = "X: %s Y: %s  |  X: %s кл. Y: %s кл.  |  %s shapes total" % \
                                (pointer[0], pointer[1],
                                 int(better_divmod(pointer[0], canvas.cell_size_wid.get())[0]),
-                                int(better_divmod(canvas.height - pointer[1], canvas.cell_size_wid.get())[0]))
+                                int(better_divmod(canvas.height - pointer[1], canvas.cell_size_wid.get())[0]),
+                                canvas.now_figures)
+    drawing_now = shape_selector.get()
 
     # Если количество фигур на холсте больше нуля, то включаем
     # Кнопку "отмена", ведь теперь можно убрать последнюю нарисованную
@@ -140,7 +133,8 @@ while canvas.is_running:
                               font="Verdana 10", anchor=NW)
 
     # Процесс рисования фигуры продолжается до отпускания левой кнопки мыши:
-    if canvas.is_drawing_now:
+    if drawing_now != -1 and not \
+            ((pointer[0] > canvas.x+canvas.width) or (pointer[1] > canvas.y+canvas.height)):
         mouse_pos = canvas.get_mouse_pos()
         cell_size = csw.get()
 
@@ -160,16 +154,16 @@ while canvas.is_running:
                 x_posted = post_cell(mouse_pos[0], cellsize=cell_size)
                 y_posted = post_cell(mouse_pos[1], cellsize=cell_size)
 
-            if canvas.is_drawing_now == "line":
+            if drawing_now == 0:
                 canvas.draw_line(begin_x_posted, begin_y_posted, x_posted, y_posted,
                                  fill=canvas.color_wid.get_line_color())
 
-            if canvas.is_drawing_now == "rectangle":
+            if drawing_now == 1:
                 canvas.draw_rectangle(begin_x_posted, begin_y_posted, x_posted, y_posted,
                                       fill=canvas.color_wid.get_fill_color(),
                                       outline=canvas.color_wid.get_line_color())
 
-            if canvas.is_drawing_now == "circle":
+            if drawing_now == 2:
                 canvas.draw_circle(begin_x_posted, begin_y_posted, x_posted, y_posted,
                                    fill=canvas.color_wid.get_fill_color(),
                                    outline=canvas.color_wid.get_line_color())

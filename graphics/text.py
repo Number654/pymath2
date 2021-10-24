@@ -33,6 +33,7 @@ class TextSpawner:
             self.canvas.canvas_objects.append(CanvasObject("text", form_coords,
                                               fill=self.canvas.color_wid.get_line_color(),
                                               text=text, tag=figure_name))
+            self.canvas.now_figures += 1  # Увеличить число фигур - текст тоже учитывается
             dlg.destroy()
         else:
             showwarning("Ошибка", "Введите правильное десятичное число!")

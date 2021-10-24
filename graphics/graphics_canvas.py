@@ -11,6 +11,9 @@ from .mouse import post_cell
 from .xml_engine import *
 
 
+figure_codes = ["line", "rectangle", "circle"]
+
+
 class GeometryCanvas:
 
     def __init__(self, master, color_widget, cell_size_widget, undo_button, redo_button, pixel_acc_var, width, height):
@@ -25,7 +28,6 @@ class GeometryCanvas:
         self.redo_btn = redo_button
         self.pixel_mode_flag = pixel_acc_var
 
-        self.is_drawing_now = None
         self.begin_x = None
         self.begin_y = None
 
@@ -33,6 +35,7 @@ class GeometryCanvas:
 
         self.canvas_objects = []
         self.canceled_objects = []
+        self.now_figures = 0  # Сколько сейчас фигур нарисовано?
 
         self.canvas = Canvas(master, width=self.width, height=self.height, bg="#ffffff",
                              cursor="tcross")
@@ -55,6 +58,7 @@ class GeometryCanvas:
     def clear_all(self):
         self.canvas_objects = []
         self.update()
+        self.now_figures = 0
 
     # Команда для нажатия на кнопку "Очистить"
     # Отдельная команда с сохранением стертых фигур, чтобы можно было отменить очистку
@@ -92,32 +96,19 @@ class GeometryCanvas:
     def write_text(self, *args, **kwargs):
         self.canvas.create_text(args, kwargs)
 
-    # Обозначить готовность к рисованию мышкой
-    def set_drawing_by_mouse(self, event, figure="line"):
-        """
-           Вызывается при нажатии специальных клавиш
-           для рисования фигур: Left Control - линия,
-           Left Shift - прямоугольник, Left Alt - эллипс.
-        """
-        self.is_drawing_now = figure
-
-    # Сбросить готовность к рисованию мышкой
-    def unset_drawing_by_mouse(self, event):
-        # Вызывается при отпускании указанных выше клавиш
-        self.is_drawing_now = None
-
     # Получить координаты места начала зажатия левой кнопки мыши
-    def start_drawing_by_mouse(self, event):
-        if self.is_drawing_now is not None:
+    def start_drawing_by_mouse(self, event, figure):
+        if figure != -1 and not ((event.x < self.x or event.x > self.x+self.width) or
+                                 (event.y < self.y or event.y > self.y+self.height)):
             self.begin_x = event.x
             self.begin_y = event.y
 
     # Занести нарисованную фигуру в список всех фигур
-    def stop_drawing_by_mouse(self, event):
-        figure_name = str(hex(randint(15, 1555)))
+    def stop_drawing_by_mouse(self, event, figure):
+        figure_name = str(hex(randint(2, 2**50)))
         cell_size = self.cell_size_wid.get()
 
-        if self.is_drawing_now is not None:
+        if figure != -1:
             try:
                 # Если режим рисования с точностью до пикселей включен, то
                 # Просто ссылаемся на координаты, не вызывая метода post_cell()
@@ -134,11 +125,12 @@ class GeometryCanvas:
                     x_posted = post_cell(event.x, cellsize=cell_size)
                     y_posted = post_cell(event.y, cellsize=cell_size)
 
-                self.canvas_objects.append(CanvasObject(self.is_drawing_now,
+                self.canvas_objects.append(CanvasObject(figure_codes[figure],
                                                         (begin_x_posted, begin_y_posted,
                                                          x_posted, y_posted),
                                                         outline=self.color_wid.get_line_color(),
                                                         fill=self.color_wid.get_fill_color(), name=figure_name))
+                self.now_figures += 1  # Увеличиваем количество фигур
             except TypeError:
                 pass
             self.begin_x, self.begin_y = (None, None)
@@ -232,11 +224,13 @@ class GeometryCanvas:
     def undo(self):
         self.canceled_objects.append(self.canvas_objects[-1])
         self.canvas_objects.pop(-1)
+        self.now_figures -= 1  # Отменить рисование фигуры - уменьшаем к-во фигур
 
     # Повторить отмененное действие
     def redo(self):
         self.canvas_objects.append(self.canceled_objects[-1])
         self.canceled_objects.pop(-1)
+        self.now_figures += 1  # Повтороить отмененную фигуру - снова увеличиваем число фигур
 
     def quit(self):
         self.is_running = False
