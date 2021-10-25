@@ -18,12 +18,12 @@ class ShapeManager:
     выбранные мышью фигуры.
     """
 
-    def __init__(self, master, canvas):
+    def __init__(self, master, canvas=None):
         self.master = master
         self.canvas = canvas
         self.shapes = []
 
-        self.frame = Frame(self.master, width=170, height=394, bd=2,
+        self.frame = Frame(self.master, width=170, height=397, bd=2,
                            relief="groove")
         self.shapes_list = Listbox(self.frame, width=25, height=15, bd=2)
         self.delete_button = Button(self.frame, text="Удалить", width=24,
@@ -31,8 +31,12 @@ class ShapeManager:
 
         Label(self.frame, text="Настройка фигур").place(x=30, y=0)
 
-        for i in range(20):
-            self.add(CanvasObject("circle"))
+    # Так как в класс "GraphicsCanvas" нужно передать экземпляр класса "ShapeManager",
+    # получается, что они ссылаются друг на друга. Поэтому, сначала в GraphicsCanvas
+    # передается этот класс, а затем, с помощью этого метода, в этот класс передается
+    # GraphicsCanvas. Вызов данного метода обязателен.
+    def set_canvas(self, canvas):
+        self.canvas = canvas
 
     def place(self, x=0, y=0):
         self.frame.place(x=x, y=y)

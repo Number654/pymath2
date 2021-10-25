@@ -16,17 +16,18 @@ figure_codes = ["line", "rectangle", "circle"]
 
 class GeometryCanvas:
 
-    def __init__(self, master, color_widget, cell_size_widget, undo_button, redo_button, pixel_acc_var, width, height):
+    def __init__(self, master, width, height, *args):
         self.master = master
         self.x = 0
         self.y = 0
         self.width = width
         self.height = height
-        self.cell_size_wid = cell_size_widget
-        self.color_wid = color_widget
-        self.undo_btn = undo_button
-        self.redo_btn = redo_button
-        self.pixel_mode_flag = pixel_acc_var
+        self.cell_size_wid = args[1]  # Виджет изменения размера клетки
+        self.color_wid = args[0]  # Виджет изменения цветов
+        self.undo_btn = args[2]  # Кнопка "Отменить" действие
+        self.redo_btn = args[3]  # Кнопка "Повторить" действие
+        self.pixel_mode_flag = args[4]  # Флажок "Рисовать по пикселям или клеткам"
+        self.shape_manager = args[5]  # Виджет настройки и управления фигурами
 
         self.begin_x = None
         self.begin_y = None
@@ -108,11 +109,12 @@ class GeometryCanvas:
         figure_name = str(hex(randint(2, 2**50)))
         cell_size = self.cell_size_wid.get()
 
-        if figure != -1:
+        if figure != -1 and not ((event.x < self.x or event.x > self.x+self.width) or
+                                 (event.y < self.y or event.y > self.y+self.height)):
             try:
                 # Если режим рисования с точностью до пикселей включен, то
                 # Просто ссылаемся на координаты, не вызывая метода post_cell()
-                if self.pixel_mode_flag.get():
+                if self.pixel_mode_flag.get() and (self.begin_x is not None and self.begin_y is not None):
                     begin_x_posted = self.begin_x
                     begin_y_posted = self.begin_y
                     x_posted = event.x
@@ -166,8 +168,9 @@ class GeometryCanvas:
                     # Добавляем загруженные фигуры в canvas_objects
                     for figure in figures:
                         self.canvas_objects.append(figure)
+                        self.now_figures += 1
                     # Добавляем в заголовок имя импортированного файла
-                    self.master.title('Graphics - %s' % filename)
+                    self.master.title('GraphX - %s' % filename)
 
     def save(self):
         canvas = self

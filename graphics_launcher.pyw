@@ -14,7 +14,7 @@ from graphics.shape_selector import ShapeSelector
 
 # Окно
 tk = Tk()
-tk.title('Graphics')
+tk.title('GraphX')
 tk.geometry("910x460")
 tk.resizable(0, 0)
 
@@ -35,17 +35,19 @@ redo_button = Button(undo_redo_frame, text='Повтор', state=DISABLED)
 undo_button.place(x=7, y=0)
 redo_button.place(x=7, y=25)
 
-canvas = GeometryCanvas(tk, cwg, csw, undo_button, redo_button, pixel_mode, 596, 394)
+shape_mgr = ShapeManager(tk)
+shape_mgr.place(730, 20)
+
+canvas = GeometryCanvas(tk, 596, 394, cwg, csw, undo_button, redo_button, pixel_mode, shape_mgr)
 canvas.place(x=19, y=20)
 canvas.draw_net()
+
+shape_mgr.set_canvas(canvas)  # Задаем холст для виджета управления фигурами
 
 cwg.place(x=625, y=21)
 cwg.enable_fill()
 
 csw.place(x=625, y=121)
-
-shape_mgr = ShapeManager(tk, canvas)
-shape_mgr.place(730, 20)
 
 # Кнопки экспорта, импорта, сохраниния изменений рисунка
 export_image_button = Button(tk, text='Экспорт...', width=12, command=canvas.save)
@@ -121,15 +123,15 @@ while canvas.is_running:
     # Отрисовываем ранее созданные фигуры
     for i in canvas.canvas_objects:
         if i.figure == "line":
-            canvas.draw_line(i.args, fill=i.kwargs["outline"], tag=i.kwargs["name"])
+            canvas.draw_line(*i.args, fill=i.kwargs["outline"], tag=i.kwargs["name"])
         if i.figure == "rectangle":
-            canvas.draw_rectangle(i.args, fill=i.kwargs["fill"], outline=i.kwargs["outline"],
+            canvas.draw_rectangle(*i.args, fill=i.kwargs["fill"], outline=i.kwargs["outline"],
                                   tag=i.kwargs["name"])
         if i.figure == "circle":
-            canvas.draw_circle(i.args, fill=i.kwargs["fill"], outline=i.kwargs["outline"],
+            canvas.draw_circle(*i.args, fill=i.kwargs["fill"], outline=i.kwargs["outline"],
                                tag=i.kwargs["name"])
         if i.figure == "text":
-            canvas.write_text(i.args, fill=i.kwargs["fill"], text=i.kwargs["text"],
+            canvas.write_text(*i.args, fill=i.kwargs["fill"], text=i.kwargs["text"],
                               font="Verdana 10", anchor=NW)
 
     # Процесс рисования фигуры продолжается до отпускания левой кнопки мыши:
