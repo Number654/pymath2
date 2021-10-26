@@ -5,7 +5,7 @@ from tkinter.ttk import Button
 from .canvas_object import CanvasObject
 
 
-shape_names = {"line": "Прямая", "rectangle": "Прямоугольник",
+shape_names = {"line": "Отрезок", "rectangle": "Прямоугольник",
                "circle": "Окружность", "text": "Надпись"}  # Русскоязычные названия фигур
 
 
@@ -25,7 +25,7 @@ class ShapeManager:
 
         self.frame = Frame(self.master, width=170, height=397, bd=2,
                            relief="groove")
-        self.shapes_list = Listbox(self.frame, width=25, height=15, bd=2)
+        self.shapes_list = Listbox(self.frame, width=25, height=15, bd=2, command=None)
         self.delete_button = Button(self.frame, text="Удалить", width=24,
                                     command=lambda: self.delete(self.shapes_list.curselection()[0]))
 
@@ -53,3 +53,7 @@ class ShapeManager:
         self.shapes.pop(index)
         for i, sh in enumerate(self.shapes, 1):
             self.shapes_list.insert("end", str(i)+". "+shape_names[sh.figure])
+
+    def clear(self):
+        self.shapes = []
+        self.shapes_list.delete(0, "end")

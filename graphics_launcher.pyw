@@ -97,7 +97,7 @@ while canvas.is_running:
     canvas.draw_net()
 
     # Выводим на экран текущую позицию курсора мыши в пикселях и клетках
-    pointer = canvas.get_mouse_pos()
+    pointer = canvas.abs_mouse_pos()
     coordinates_text['text'] = "X: %s Y: %s  |  X: %s кл. Y: %s кл.  |  %s shapes total" % \
                                (pointer[0], pointer[1],
                                 int(better_divmod(pointer[0], canvas.cell_size_wid.get())[0]),
@@ -137,7 +137,7 @@ while canvas.is_running:
     # Процесс рисования фигуры продолжается до отпускания левой кнопки мыши:
     if drawing_now != -1 and not \
             ((pointer[0] > canvas.x+canvas.width) or (pointer[1] > canvas.y+canvas.height)):
-        mouse_pos = canvas.get_mouse_pos()
+        mouse_pos = canvas.canvas_mouse_pos()  # Получаем позицию курсора относительно холста для отрисовки
         cell_size = csw.get()
 
         try:

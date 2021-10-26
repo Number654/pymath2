@@ -17,7 +17,7 @@ class TextSpawner:
     # Закрыть диалог по нажатии на кнопку "OK"
     def do_spawn(self, dlg, text, coords):
         font = "Verdana 10"
-        figure_name = str(hex(randint(15, 1555)))
+        figure_name = str(hex(randint(2, 2**50)))
 
         # Проверка на корректность введенные координаты
         if isfloat(coords[0]) and isfloat(coords[1]):
@@ -29,11 +29,14 @@ class TextSpawner:
             # Пишем текст
             self.canvas.write_text(form_coords, fill=self.canvas.color_wid.get_line_color(),
                                    text=text, font=font, anchor=NW, tag=figure_name)
+
             # Заносим этот текст в список объектов холста
-            self.canvas.canvas_objects.append(CanvasObject("text", form_coords,
-                                              fill=self.canvas.color_wid.get_line_color(),
-                                              text=text, tag=figure_name))
+            c_obj = CanvasObject("text", form_coords, fill=self.canvas.color_wid.get_line_color(),
+                                 text=text, tag=figure_name)
+            self.canvas.canvas_objects.append(c_obj)
+            self.canvas.shape_manager.add(c_obj)
             self.canvas.now_figures += 1  # Увеличить число фигур - текст тоже учитывается
+
             dlg.destroy()
         else:
             showwarning("Ошибка", "Введите правильное десятичное число!")

@@ -58,6 +58,7 @@ class GeometryCanvas:
 
     def clear_all(self):
         self.canvas_objects = []
+        self.shape_manager.clear()
         self.update()
         self.now_figures = 0
 
@@ -99,8 +100,9 @@ class GeometryCanvas:
 
     # Получить координаты места начала зажатия левой кнопки мыши
     def start_drawing_by_mouse(self, event, figure):
-        if figure != -1 and not ((event.x < self.x or event.x > self.x+self.width) or
-                                 (event.y < self.y or event.y > self.y+self.height)):
+        mouse_pos = self.abs_mouse_pos()
+        if figure != -1 and not ((mouse_pos[0] <= self.x or mouse_pos[0] >= self.x+self.width) or
+                                 (mouse_pos[1] <= self.y or mouse_pos[1] >= self.y+self.height)):
             self.begin_x = event.x
             self.begin_y = event.y
 
@@ -108,9 +110,10 @@ class GeometryCanvas:
     def stop_drawing_by_mouse(self, event, figure):
         figure_name = str(hex(randint(2, 2**50)))
         cell_size = self.cell_size_wid.get()
+        mouse_pos = self.abs_mouse_pos()
 
-        if figure != -1 and not ((event.x < self.x or event.x > self.x+self.width) or
-                                 (event.y < self.y or event.y > self.y+self.height)):
+        if figure != -1 and not ((mouse_pos[0] <= self.x or mouse_pos[0] >= self.x+self.width) or
+                                 (mouse_pos[1] <= self.y or mouse_pos[1] >= self.y+self.height)):
             try:
                 # Если режим рисования с точностью до пикселей включен, то
                 # Просто ссылаемся на координаты, не вызывая метода post_cell()
@@ -126,18 +129,24 @@ class GeometryCanvas:
                     begin_y_posted = post_cell(self.begin_y, cellsize=cell_size)
                     x_posted = post_cell(event.x, cellsize=cell_size)
                     y_posted = post_cell(event.y, cellsize=cell_size)
-
-                self.canvas_objects.append(CanvasObject(figure_codes[figure],
-                                                        (begin_x_posted, begin_y_posted,
-                                                         x_posted, y_posted),
-                                                        outline=self.color_wid.get_line_color(),
-                                                        fill=self.color_wid.get_fill_color(), name=figure_name))
+                c_obj = CanvasObject(figure_codes[figure], (begin_x_posted, begin_y_posted, x_posted, y_posted),
+                                     outline=self.color_wid.get_line_color(),
+                                     fill=self.color_wid.get_fill_color(), name=figure_name)
+                self.canvas_objects.append(c_obj)
+                self.shape_manager.add(c_obj)
                 self.now_figures += 1  # Увеличиваем количество фигур
             except TypeError:
                 pass
             self.begin_x, self.begin_y = (None, None)
 
-    def get_mouse_pos(self):
+    # Абсолютная позиция курсора (нужна для проверки, не пытается ли пользователь
+    # нарисовать фигуру за пределами холста?)
+    def abs_mouse_pos(self):
+        return [self.master.winfo_pointerx() - self.master.winfo_rootx(),
+                self.master.winfo_pointery() - self.master.winfo_rooty()]
+
+    # Позиция курсора относительно холста (нужна для отрисовки фигур на холсте)
+    def canvas_mouse_pos(self):
         return [self.canvas.winfo_pointerx() - self.canvas.winfo_rootx(),
                 self.canvas.winfo_pointery() - self.canvas.winfo_rooty()]
 
@@ -168,6 +177,7 @@ class GeometryCanvas:
                     # Добавляем загруженные фигуры в canvas_objects
                     for figure in figures:
                         self.canvas_objects.append(figure)
+                        self.shape_manager.add(figure)
                         self.now_figures += 1
                     # Добавляем в заголовок имя импортированного файла
                     self.master.title('GraphX - %s' % filename)
