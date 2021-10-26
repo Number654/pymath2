@@ -136,43 +136,39 @@ while canvas.is_running:
 
     # Процесс рисования фигуры продолжается до отпускания левой кнопки мыши:
     if drawing_now != -1 and not \
-            ((pointer[0] > canvas.x+canvas.width) or (pointer[1] > canvas.y+canvas.height)):
+            ((pointer[0] > canvas.x+canvas.width) or (pointer[1] > canvas.y+canvas.height)) and \
+            (canvas.begin_x is not None and canvas.begin_y is not None):
         mouse_pos = canvas.canvas_mouse_pos()  # Получаем позицию курсора относительно холста для отрисовки
         cell_size = csw.get()
 
-        try:
-            # Если режим рисования с точностью до пикселей включен, то
-            # Просто ссылаемся на координаты, не вызывая метода post_cell()
-            if pixel_mode.get():
-                begin_x_posted = canvas.begin_x
-                begin_y_posted = canvas.begin_y
-                x_posted = mouse_pos[0]
-                y_posted = mouse_pos[1]
-            # Если режим рисования с точностью до пикселей выключен, то вызываем
-            # Метод post_cell(), который просчитывает координаты по клеткам
-            else:
-                begin_x_posted = post_cell(canvas.begin_x, cellsize=cell_size)
-                begin_y_posted = post_cell(canvas.begin_y, cellsize=cell_size)
-                x_posted = post_cell(mouse_pos[0], cellsize=cell_size)
-                y_posted = post_cell(mouse_pos[1], cellsize=cell_size)
+        # Если режим рисования с точностью до пикселей включен, то
+        # Просто ссылаемся на координаты, не вызывая метода post_cell()
+        if pixel_mode.get():
+            begin_x_posted = canvas.begin_x
+            begin_y_posted = canvas.begin_y
+            x_posted = mouse_pos[0]
+            y_posted = mouse_pos[1]
+        # Если режим рисования с точностью до пикселей выключен, то вызываем
+        # Метод post_cell(), который просчитывает координаты по клеткам
+        else:
+            begin_x_posted = post_cell(canvas.begin_x, cellsize=cell_size)
+            begin_y_posted = post_cell(canvas.begin_y, cellsize=cell_size)
+            x_posted = post_cell(mouse_pos[0], cellsize=cell_size)
+            y_posted = post_cell(mouse_pos[1], cellsize=cell_size)
 
-            if drawing_now == 0:
-                canvas.draw_line(begin_x_posted, begin_y_posted, x_posted, y_posted,
-                                 fill=canvas.color_wid.get_line_color())
+        if drawing_now == 0:
+            canvas.draw_line(begin_x_posted, begin_y_posted, x_posted, y_posted,
+                             fill=canvas.color_wid.get_line_color())
 
-            if drawing_now == 1:
-                canvas.draw_rectangle(begin_x_posted, begin_y_posted, x_posted, y_posted,
-                                      fill=canvas.color_wid.get_fill_color(),
-                                      outline=canvas.color_wid.get_line_color())
+        if drawing_now == 1:
+            canvas.draw_rectangle(begin_x_posted, begin_y_posted, x_posted, y_posted,
+                                  fill=canvas.color_wid.get_fill_color(),
+                                  outline=canvas.color_wid.get_line_color())
 
-            if drawing_now == 2:
-                canvas.draw_circle(begin_x_posted, begin_y_posted, x_posted, y_posted,
-                                   fill=canvas.color_wid.get_fill_color(),
-                                   outline=canvas.color_wid.get_line_color())
-        # Тут убираются ошибки о том, что в качестве аргументов для вычисления
-        # Координат в функцию передается мусор
-        except (TypeError, TclError):
-            pass
+        if drawing_now == 2:
+            canvas.draw_circle(begin_x_posted, begin_y_posted, x_posted, y_posted,
+                               fill=canvas.color_wid.get_fill_color(),
+                               outline=canvas.color_wid.get_line_color())
         del mouse_pos
 
     sleep(0.001)

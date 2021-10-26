@@ -114,29 +114,26 @@ class GeometryCanvas:
 
         if figure != -1 and not ((mouse_pos[0] <= self.x or mouse_pos[0] >= self.x+self.width) or
                                  (mouse_pos[1] <= self.y or mouse_pos[1] >= self.y+self.height)):
-            try:
-                # Если режим рисования с точностью до пикселей включен, то
-                # Просто ссылаемся на координаты, не вызывая метода post_cell()
-                if self.pixel_mode_flag.get() and (self.begin_x is not None and self.begin_y is not None):
-                    begin_x_posted = self.begin_x
-                    begin_y_posted = self.begin_y
-                    x_posted = event.x
-                    y_posted = event.y
-                # Если режим рисования с точностью до пикселей выключен, то вызываем
-                # Метод post_cell(), который просчитывает координаты по клеткам
-                else:
-                    begin_x_posted = post_cell(self.begin_x, cellsize=cell_size)
-                    begin_y_posted = post_cell(self.begin_y, cellsize=cell_size)
-                    x_posted = post_cell(event.x, cellsize=cell_size)
-                    y_posted = post_cell(event.y, cellsize=cell_size)
-                c_obj = CanvasObject(figure_codes[figure], (begin_x_posted, begin_y_posted, x_posted, y_posted),
-                                     outline=self.color_wid.get_line_color(),
-                                     fill=self.color_wid.get_fill_color(), name=figure_name)
-                self.canvas_objects.append(c_obj)
-                self.shape_manager.add(c_obj)
-                self.now_figures += 1  # Увеличиваем количество фигур
-            except TypeError:
-                pass
+            # Если режим рисования с точностью до пикселей включен, то
+            # Просто ссылаемся на координаты, не вызывая метода post_cell()
+            if self.pixel_mode_flag.get() and (self.begin_x is not None and self.begin_y is not None):
+                begin_x_posted = self.begin_x
+                begin_y_posted = self.begin_y
+                x_posted = event.x
+                y_posted = event.y
+            # Если режим рисования с точностью до пикселей выключен, то вызываем
+            # Метод post_cell(), который просчитывает координаты по клеткам
+            else:
+                begin_x_posted = post_cell(self.begin_x, cellsize=cell_size)
+                begin_y_posted = post_cell(self.begin_y, cellsize=cell_size)
+                x_posted = post_cell(event.x, cellsize=cell_size)
+                y_posted = post_cell(event.y, cellsize=cell_size)
+            c_obj = CanvasObject(figure_codes[figure], (begin_x_posted, begin_y_posted, x_posted, y_posted),
+                                 outline=self.color_wid.get_line_color(),
+                                 fill=self.color_wid.get_fill_color(), name=figure_name)
+            self.canvas_objects.append(c_obj)
+            self.shape_manager.add(c_obj)
+            self.now_figures += 1  # Увеличиваем количество фигур
             self.begin_x, self.begin_y = (None, None)
 
     # Абсолютная позиция курсора (нужна для проверки, не пытается ли пользователь
