@@ -234,11 +234,13 @@ class GeometryCanvas:
     def undo(self):
         self.canceled_objects.append(self.canvas_objects[-1])
         self.canvas_objects.pop(-1)
+        self.shape_manager.delete(-1)  # Удаляем фигуру и из настройщика
         self.now_figures -= 1  # Отменить рисование фигуры - уменьшаем к-во фигур
 
     # Повторить отмененное действие
     def redo(self):
         self.canvas_objects.append(self.canceled_objects[-1])
+        self.shape_manager.add(self.canceled_objects[-1])  # Добавляем в настройщик фигур восстановленную фигуру
         self.canceled_objects.pop(-1)
         self.now_figures += 1  # Повтороить отмененную фигуру - снова увеличиваем число фигур
 

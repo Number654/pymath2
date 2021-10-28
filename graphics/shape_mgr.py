@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from tkinter import Frame, Listbox, Label
-from tkinter.ttk import Button
-from .canvas_object import CanvasObject
+from tkinter import Frame, Listbox, Label, IntVar
+from tkinter.ttk import Button, Checkbutton
 
 
 shape_names = {"line": "Отрезок", "rectangle": "Прямоугольник",
@@ -22,12 +21,15 @@ class ShapeManager:
         self.master = master
         self.canvas = canvas
         self.shapes = []
+        self.show_one_mode = IntVar()
 
         self.frame = Frame(self.master, width=170, height=397, bd=2,
                            relief="groove")
         self.shapes_list = Listbox(self.frame, width=25, height=15, bd=2, command=None)
         self.delete_button = Button(self.frame, text="Удалить", width=24,
                                     command=lambda: self.delete(self.shapes_list.curselection()[0]))
+        self.show_one_mode_btn = Checkbutton(self.frame, text="Показывать по одной",
+                                             variable=self.show_one_mode)
 
         Label(self.frame, text="Настройка фигур").place(x=30, y=0)
 
@@ -42,6 +44,7 @@ class ShapeManager:
         self.frame.place(x=x, y=y)
         self.shapes_list.place(x=4, y=30)
         self.delete_button.place(x=4, y=280)
+        self.show_one_mode_btn.place(x=4, y=305)
 
     # Добавить в список фигуру
     def add(self, canvas_obj):
@@ -57,3 +60,10 @@ class ShapeManager:
     def clear(self):
         self.shapes = []
         self.shapes_list.delete(0, "end")
+
+
+class ShapeCommander:
+
+    def __init__(self, manager, canvas):
+        self.manager = manager  # Виджет настройщика фигур
+        self.canvas = canvas  # Холст, на котором отрисовываются фигуры
