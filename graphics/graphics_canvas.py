@@ -3,9 +3,8 @@
 from tkinter import Canvas, ALL
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.messagebox import showwarning
-from random import randint
-from copy import deepcopy
 from os.path import splitext
+from time import time
 
 from .mouse import post_cell
 from .xml_engine import *
@@ -22,12 +21,12 @@ class GeometryCanvas:
         self.y = 0
         self.width = width
         self.height = height
+
         self.cell_size_wid = args[1]  # Виджет изменения размера клетки
         self.color_wid = args[0]  # Виджет изменения цветов
-        self.undo_btn = args[2]  # Кнопка "Отменить" действие
-        self.redo_btn = args[3]  # Кнопка "Повторить" действие
-        self.pixel_mode_flag = args[4]  # Флажок "Рисовать по пикселям или клеткам"
-        self.shape_manager = args[5]  # Виджет настройки и управления фигурами
+        self.pixel_mode_flag = args[2]  # Флажок "Рисовать по пикселям или клеткам"
+        self.shape_manager = args[3]  # Виджет настройки и управления фигурами
+        self.shape_selector = args[4]  # Виджет выбора рисуемой фигуры
 
         self.begin_x = None
         self.begin_y = None
@@ -35,16 +34,11 @@ class GeometryCanvas:
         self.is_running = True
 
         self.canvas_objects = []
-        self.canceled_objects = []
+        self.showed_now = None  # Какую фигуру сейчас показывать? (переменная нужна для режима показа при выделении)
         self.now_figures = 0  # Сколько сейчас фигур нарисовано?
 
         self.canvas = Canvas(master, width=self.width, height=self.height, bg="#ffffff",
                              cursor="tcross")
-
-        # Привязываем действие к кнопке "отмены рисования последней фигуры"
-        # И к кнопке "аовтора рисования отмененной фигуры"
-        self.undo_btn['command'] = self.undo
-        self.redo_btn['command'] = self.redo
 
     # Разместить GeometryCanvas на окне
     def place(self, x=0, y=0):
@@ -61,12 +55,6 @@ class GeometryCanvas:
         self.shape_manager.clear()
         self.update()
         self.now_figures = 0
-
-    # Команда для нажатия на кнопку "Очистить"
-    # Отдельная команда с сохранением стертых фигур, чтобы можно было отменить очистку
-    def clear_all_command(self):
-        self.canceled_objects = deepcopy(self.canvas_objects)
-        self.clear_all()
 
     # Нарисовать сетку
     def draw_net(self):
@@ -100,6 +88,9 @@ class GeometryCanvas:
 
     # Получить координаты места начала зажатия левой кнопки мыши
     def start_drawing_by_mouse(self, event, figure):
+        if self.shape_manager.show_one_mode.get():
+            return
+
         mouse_pos = self.abs_mouse_pos()
         if figure != -1 and not ((mouse_pos[0] <= self.x or mouse_pos[0] >= self.x+self.width) or
                                  (mouse_pos[1] <= self.y or mouse_pos[1] >= self.y+self.height)):
@@ -108,7 +99,10 @@ class GeometryCanvas:
 
     # Занести нарисованную фигуру в список всех фигур
     def stop_drawing_by_mouse(self, event, figure):
-        figure_name = str(hex(randint(2, 2**50)))
+        if self.shape_manager.show_one_mode.get():
+            return
+
+        figure_name = str(figure) + "@" + str(round(time()))
         cell_size = self.cell_size_wid.get()
         mouse_pos = self.abs_mouse_pos()
 
@@ -229,20 +223,6 @@ class GeometryCanvas:
             # Если пользователь указал неверное расширение (формат файла), то кидаем ошибку
             if extension != '.png' and extension != '.gd':
                 showwarning(u'Ошибка', u'Неподдерживаемое расширение: %s' % extension)
-
-    # Отменить последнее действие
-    def undo(self):
-        self.canceled_objects.append(self.canvas_objects[-1])
-        self.canvas_objects.pop(-1)
-        self.shape_manager.delete(-1)  # Удаляем фигуру и из настройщика
-        self.now_figures -= 1  # Отменить рисование фигуры - уменьшаем к-во фигур
-
-    # Повторить отмененное действие
-    def redo(self):
-        self.canvas_objects.append(self.canceled_objects[-1])
-        self.shape_manager.add(self.canceled_objects[-1])  # Добавляем в настройщик фигур восстановленную фигуру
-        self.canceled_objects.pop(-1)
-        self.now_figures += 1  # Повтороить отмененную фигуру - снова увеличиваем число фигур
 
     def quit(self):
         self.is_running = False

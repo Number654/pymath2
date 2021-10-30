@@ -34,3 +34,18 @@ class ShapeSelector:
 
     def get(self):
         return self.choice.get()
+
+    def set(self, v):
+        self.choice.set(v)
+
+    def disable(self):
+        self.line_btn.config(state="disabled")
+        self.rect_btn.config(state="disabled")
+        self.circle_btn.config(state="disabled")
+        self.stop_btn.config(state="disabled")
+
+    def enable(self):
+        self.line_btn.config(state="normal")
+        self.rect_btn.config(state="normal")
+        self.circle_btn.config(state="normal")
+        self.stop_btn.config(state="normal")

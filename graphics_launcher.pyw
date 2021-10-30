@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from tkinter import IntVar, TclError
 from tkinter.ttk import Radiobutton
 from time import sleep
 from core import better_divmod
@@ -24,21 +23,16 @@ pixel_mode = IntVar()
 csw = CellSizeWidget(tk, 94, 68)
 cwg = ColorWidget(tk, 94, 95)
 
-shape_selector = ShapeSelector(tk, )
-shape_selector.place(x=625, y=385)
+shape_selector = ShapeSelector(tk)
+shape_selector.place(x=625, y=413)
 
-undo_redo_frame = Frame(tk, width=94, height=55, relief=GROOVE, bd=2)
+undo_redo_frame = Frame(tk, width=94, height=83, relief=GROOVE, bd=2)
 undo_redo_frame.place(x=625, y=194)
-#
-undo_button = Button(undo_redo_frame, text='Отмена', state=DISABLED)
-redo_button = Button(undo_redo_frame, text='Повтор', state=DISABLED)
-undo_button.place(x=7, y=0)
-redo_button.place(x=7, y=25)
 
 shape_mgr = ShapeManager(tk)
 shape_mgr.place(730, 20)
 
-canvas = GeometryCanvas(tk, 596, 394, cwg, csw, undo_button, redo_button, pixel_mode, shape_mgr)
+canvas = GeometryCanvas(tk, 596, 394, cwg, csw, pixel_mode, shape_mgr, shape_selector)
 canvas.place(x=19, y=20)
 canvas.draw_net()
 
@@ -58,7 +52,7 @@ import_image_button.place(x=450, y=420)
 
 # Выбор режимов рисования: по пикселям или по клеточкам
 drawing_accuracy_frame = Frame(tk, width=94, height=66, relief=GROOVE, bd=2)
-drawing_accuracy_frame.place(x=625, y=254)
+drawing_accuracy_frame.place(x=625, y=282)
 Label(drawing_accuracy_frame, text="Рисование по:").place(x=0, y=0)
 
 # Для режима рисования по клеткам
@@ -71,7 +65,7 @@ pixel_accuracy_mode_radiobtn.place(x=7, y=40)
 
 
 two_buttons_frame = Frame(tk, width=94, height=55, bd=2, relief="groove")
-two_buttons_frame.place(x=625, y=325)
+two_buttons_frame.place(x=625, y=353)
 
 # Кнопка очистки холста
 clear_canvas_button = Button(two_buttons_frame, text="Очистить", width=13, command=canvas.clear_all_command)
@@ -105,23 +99,8 @@ while canvas.is_running:
                                 canvas.now_figures)
     drawing_now = shape_selector.get()
 
-    # Если количество фигур на холсте больше нуля, то включаем
-    # Кнопку "отмена", ведь теперь можно убрать последнюю нарисованную
-    # Фигуру
-    if len(canvas.canvas_objects) > 0:
-        undo_button['state'] = 'normal'
-    else:
-        undo_button['state'] = 'disabled'
-
-    # Если количесво "отмененных" фигур больше нуля,
-    # То включаем кнопку "повтор"
-    if len(canvas.canceled_objects) > 0:
-        redo_button['state'] = 'normal'
-    else:
-        redo_button['state'] = 'disabled'
-
     # Отрисовываем ранее созданные фигуры
-    for i in canvas.canvas_objects:
+    for i in canvas.canvas_objects if canvas.showed_now is None else canvas.showed_now:
         if i.figure == "line":
             canvas.draw_line(*i.args, fill=i.kwargs["outline"], tag=i.kwargs["name"])
         if i.figure == "rectangle":

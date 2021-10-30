@@ -3,7 +3,8 @@
 from tkinter import Toplevel, StringVar, NW
 from tkinter.ttk import Button, Entry
 from tkinter.messagebox import showwarning
-from random import randint
+from time import time
+
 from .canvas_object import CanvasObject
 from core.fractions import isfloat
 
@@ -17,7 +18,7 @@ class TextSpawner:
     # Закрыть диалог по нажатии на кнопку "OK"
     def do_spawn(self, dlg, text, coords):
         font = "Verdana 10"
-        figure_name = str(hex(randint(2, 2**50)))
+        figure_name = "text@" + str(round(time()))
 
         # Проверка на корректность введенные координаты
         if isfloat(coords[0]) and isfloat(coords[1]):
