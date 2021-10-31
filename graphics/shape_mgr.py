@@ -30,6 +30,7 @@ class ShapeManager:
                                     command=lambda: self.delete(self.shapes_list.curselection()[0]))
         self.show_one_mode_btn = Checkbutton(self.frame, text="Показывать по одной",
                                              variable=self.show_one_mode, command=self.show_mode)
+        self.shape_wizard = Wizard(self.frame, self.canvas)
 
         Label(self.frame, text="Настройка фигур").place(x=30, y=0)
         self.shapes_list.bind("<<ListboxSelect>>", self.show_shape_on_canvas)
@@ -46,6 +47,7 @@ class ShapeManager:
         self.shapes_list.place(x=4, y=30)
         self.delete_button.place(x=4, y=280)
         self.show_one_mode_btn.place(x=4, y=305)
+        self.shape_wizard.place(x=4, y=330)
 
     # Добавить в список фигуру
     def add(self, canvas_obj):
@@ -86,8 +88,20 @@ class ShapeManager:
             self.canvas.showed_now = [self.canvas.canvas_objects[selected[0]]]
 
 
-class ShapeCommander:
+class Wizard:
 
-    def __init__(self, manager, canvas):
-        self.manager = manager  # Виджет настройщика фигур
-        self.canvas = canvas  # Холст, на котором отрисовываются фигуры
+    """
+    Виджет, который будет появляться в виджете
+    настройки фигуры при выделении. Является
+    самим настройщиком, содержит в себе все
+    параметры настройки для каждого типа фигур.
+    """
+
+    def __init__(self, master, canvas):
+        self.master = master
+        self.canvas = canvas  # Холст, на котром нарисованы все фигуры
+
+        self.frame = Frame(self.master, width=158, height=87, bd=2, relief="groove")
+
+    def place(self, x=0, y=0):
+        self.frame.place(x=x, y=y)

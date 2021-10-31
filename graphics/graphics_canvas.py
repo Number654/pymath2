@@ -107,10 +107,12 @@ class GeometryCanvas:
         mouse_pos = self.abs_mouse_pos()
 
         if figure != -1 and not ((mouse_pos[0] <= self.x or mouse_pos[0] >= self.x+self.width) or
-                                 (mouse_pos[1] <= self.y or mouse_pos[1] >= self.y+self.height)):
+                                 (mouse_pos[1] <= self.y or mouse_pos[1] >= self.y+self.height)) and \
+                (self.begin_x is not None and self.begin_y is not None):
+
             # Если режим рисования с точностью до пикселей включен, то
             # Просто ссылаемся на координаты, не вызывая метода post_cell()
-            if self.pixel_mode_flag.get() and (self.begin_x is not None and self.begin_y is not None):
+            if self.pixel_mode_flag.get():
                 begin_x_posted = self.begin_x
                 begin_y_posted = self.begin_y
                 x_posted = event.x

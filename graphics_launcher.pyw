@@ -68,7 +68,7 @@ two_buttons_frame = Frame(tk, width=94, height=55, bd=2, relief="groove")
 two_buttons_frame.place(x=625, y=353)
 
 # Кнопка очистки холста
-clear_canvas_button = Button(two_buttons_frame, text="Очистить", width=13, command=canvas.clear_all_command)
+clear_canvas_button = Button(two_buttons_frame, text="Очистить", width=13, command=canvas.clear_all)
 clear_canvas_button.place(x=1, y=0)
 
 # Кнопка для всавки текста
