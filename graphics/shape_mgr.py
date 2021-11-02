@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from tkinter import Frame, Listbox, Label, IntVar
+from tkinter import Button as ColorButton
 from tkinter.ttk import Button, Checkbutton
 
 
@@ -25,7 +26,7 @@ class ShapeManager:
 
         self.frame = Frame(self.master, width=170, height=425, bd=2,
                            relief="groove")
-        self.shapes_list = Listbox(self.frame, width=25, height=15, bd=2, command=None)
+        self.shapes_list = Listbox(self.frame, width=25, height=12, bd=2, command=None)
         self.delete_button = Button(self.frame, text="Удалить", width=24,
                                     command=lambda: self.delete(self.shapes_list.curselection()[0]))
         self.show_one_mode_btn = Checkbutton(self.frame, text="Показывать по одной",
@@ -41,13 +42,14 @@ class ShapeManager:
     # GraphicsCanvas. Вызов данного метода обязателен.
     def set_canvas(self, canvas):
         self.canvas = canvas
+        self.shape_wizard.canvas = canvas
 
     def place(self, x=0, y=0):
         self.frame.place(x=x, y=y)
         self.shapes_list.place(x=4, y=30)
-        self.delete_button.place(x=4, y=280)
-        self.show_one_mode_btn.place(x=4, y=305)
-        self.shape_wizard.place(x=4, y=330)
+        self.delete_button.place(x=4, y=230)
+        self.show_one_mode_btn.place(x=4, y=255)
+        self.shape_wizard.place(x=4, y=277)
 
     # Добавить в список фигуру
     def add(self, canvas_obj):
@@ -84,8 +86,10 @@ class ShapeManager:
 
     def show_shape_on_canvas(self, event):
         selected = self.shapes_list.curselection()
-        if selected and self.show_one_mode.get():
-            self.canvas.showed_now = [self.canvas.canvas_objects[selected[0]]]
+        if selected:
+            if self.show_one_mode.get():
+                self.canvas.showed_now = [self.canvas.canvas_objects[selected[0]]]
+            self.shape_wizard.show_shape_view(selected[0])
 
 
 class Wizard:
@@ -101,7 +105,52 @@ class Wizard:
         self.master = master
         self.canvas = canvas  # Холст, на котром нарисованы все фигуры
 
-        self.frame = Frame(self.master, width=158, height=87, bd=2, relief="groove")
+        self.frame = Frame(self.master, width=158, height=137, bd=2, relief="groove")
+        self.apply_button = Button(self.frame, width=23, text="Применить")
 
     def place(self, x=0, y=0):
         self.frame.place(x=x, y=y)
+        self.apply_button.place(x=2, y=105)
+
+    def show_shape_view(self, sel_index):
+        c_obj = self.canvas.canvas_objects[sel_index]
+        if c_obj.figure == "line":
+            shape_view = LineView(self.frame)
+            shape_view.place(x=1, y=1)
+
+
+class ShapeView:
+
+    """
+    Данный класс и его подклассы используются
+    для отображения нескольких виджетов для
+    настройки параметров фигур (виджет изменения
+    цвета, виджет изменения размеров и координат
+    и т. п.
+    """
+
+    def __init__(self, master):
+        self.master = master
+
+        self.frame = Frame(self.master, width=148, height=100)
+
+    def place(self, x=0, y=0):
+        self.frame.place(x=x, y=y)
+
+    def destroy(self):
+        self.frame.destroy()
+
+
+class LineView(ShapeView):
+
+    def __init__(self, master):
+        super().__init__(master)
+
+        self.color_btn = ColorButton(self.frame, text="█", bg="white", relief="flat",
+                                     activebackground="white")
+
+        Label(self.frame, text="Цвет:").place(x=2, y=1)
+
+    def place(self, x=0, y=0):
+        super().place(x=x, y=y)
+        self.color_btn.place(x=7, y=20)
