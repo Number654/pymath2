@@ -102,7 +102,7 @@ while canvas.is_running:
     # Отрисовываем ранее созданные фигуры
     for i in canvas.canvas_objects if canvas.showed_now is None else canvas.showed_now:
         if i.figure == "line":
-            canvas.draw_line(*i.args, fill=i.kwargs["outline"], tag=i.kwargs["name"])
+            canvas.draw_line(*i.args, fill=i.kwargs["outline"], width=i.kwargs["width"], tag=i.kwargs["name"])
         if i.figure == "rectangle":
             canvas.draw_rectangle(*i.args, fill=i.kwargs["fill"], outline=i.kwargs["outline"],
                                   tag=i.kwargs["name"])
@@ -137,17 +137,17 @@ while canvas.is_running:
 
         if drawing_now == 0:
             canvas.draw_line(begin_x_posted, begin_y_posted, x_posted, y_posted,
-                             fill=canvas.color_wid.get_line_color())
+                             fill=canvas.color_wid.get_line_color(), width=1)
 
         if drawing_now == 1:
             canvas.draw_rectangle(begin_x_posted, begin_y_posted, x_posted, y_posted,
                                   fill=canvas.color_wid.get_fill_color(),
-                                  outline=canvas.color_wid.get_line_color())
+                                  outline=canvas.color_wid.get_line_color(), width=1)
 
         if drawing_now == 2:
             canvas.draw_circle(begin_x_posted, begin_y_posted, x_posted, y_posted,
                                fill=canvas.color_wid.get_fill_color(),
-                               outline=canvas.color_wid.get_line_color())
+                               outline=canvas.color_wid.get_line_color(), width=1)
         del mouse_pos
 
     sleep(0.001)

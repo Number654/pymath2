@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from tkinter import Frame, Listbox, Label, IntVar
+from tkinter import Frame, Listbox, Label, IntVar, StringVar
 from tkinter import Button as ColorButton
-from tkinter.ttk import Button, Checkbutton
+from tkinter.ttk import Button, Checkbutton, Entry
+from tkinter.messagebox import showwarning
+
+from .canvas_object import CanvasObject
 
 
 shape_names = {"line": "Отрезок", "rectangle": "Прямоугольник",
@@ -106,6 +109,8 @@ class Wizard:
         self.canvas = canvas  # Холст, на котром нарисованы все фигуры
 
         self.frame = Frame(self.master, width=158, height=137, bd=2, relief="groove")
+        self.shape_view = ShapeView(self.frame)  # Фрейм с виджетами настройки выделенной фигуры
+
         self.apply_button = Button(self.frame, width=23, text="Применить")
 
     def place(self, x=0, y=0):
@@ -113,10 +118,15 @@ class Wizard:
         self.apply_button.place(x=2, y=105)
 
     def show_shape_view(self, sel_index):
+        if self.shape_view is not None:
+            self.shape_view.destroy()
+
         c_obj = self.canvas.canvas_objects[sel_index]
         if c_obj.figure == "line":
-            shape_view = LineView(self.frame)
-            shape_view.place(x=1, y=1)
+            self.shape_view = LineView(self.frame, self.canvas, sel_index)
+            self.shape_view.place(x=1, y=1)
+            self.shape_view.set()
+            self.apply_button.config(command=self.shape_view.apply)
 
 
 class ShapeView:
@@ -129,8 +139,10 @@ class ShapeView:
     и т. п.
     """
 
-    def __init__(self, master):
+    def __init__(self, master, canvas=None, index=None):
         self.master = master
+        self.canvas = canvas
+        self.index = index
 
         self.frame = Frame(self.master, width=148, height=100)
 
@@ -140,17 +152,63 @@ class ShapeView:
     def destroy(self):
         self.frame.destroy()
 
+    def set(self):
+        pass
+
+    def apply(self):
+        pass
+
 
 class LineView(ShapeView):
 
-    def __init__(self, master):
-        super().__init__(master)
+    def __init__(self, master, canvas, index):
+        super().__init__(master, canvas=canvas,
+                         index=index)
+
+        self.line_width = StringVar()
+        self.line_color = StringVar()
+        self.x1 = StringVar()
+        self.y1 = StringVar()
+        self.x2 = StringVar()
+        self.y2 = StringVar()
 
         self.color_btn = ColorButton(self.frame, text="█", bg="white", relief="flat",
                                      activebackground="white")
+        self.line_width_entry = Entry(self.frame, textvariable=self.line_width, width=7)
+        self.x1_entry = Entry(self.frame, textvariable=self.x1, width=3)
+        self.y1_entry = Entry(self.frame, textvariable=self.y1, width=3)
+        self.x2_entry = Entry(self.frame, textvariable=self.x2, width=3)
+        self.y2_entry = Entry(self.frame, textvariable=self.y2, width=3)
 
         Label(self.frame, text="Цвет:").place(x=2, y=1)
+        Label(self.frame, text="Толщина:").place(x=50, y=1)
+        Label(self.frame, text="X1:").place(x=2, y=50)
+        Label(self.frame, text="Y1:").place(x=42, y=50)
+        Label(self.frame, text="X2:").place(x=82, y=50)
+        Label(self.frame, text="Y2:").place(x=122, y=50)
+
+        self.line_color.set("black")
 
     def place(self, x=0, y=0):
         super().place(x=x, y=y)
-        self.color_btn.place(x=7, y=20)
+        self.color_btn.place(x=7, y=22)
+        self.line_width_entry.place(x=55, y=22)
+        self.x1_entry.place(x=2, y=75)
+        self.y1_entry.place(x=42, y=75)
+        self.x2_entry.place(x=82, y=75)
+        self.y2_entry.place(x=122, y=75)
+
+    def set(self):
+        self.line_width.set(str(self.canvas.canvas_objects[self.index].kwargs["width"]))
+        self.x1.set(str(round(self.canvas.canvas_objects[self.index].args[0][0], 2)))
+        self.y1.set(str(round(self.canvas.canvas_objects[self.index].args[0][1], 2)))
+        self.x2.set(str(round(self.canvas.canvas_objects[self.index].args[0][2], 2)))
+        self.y2.set(str(round(self.canvas.canvas_objects[self.index].args[0][3], 2)))
+
+    def apply(self):
+        self.canvas.canvas_objects[self.index].args = ((float(self.x1.get()), float(self.y1.get()),
+                                                        float(self.x2.get()), float(self.y2.get())),)
+        self.canvas.canvas_objects[self.index].kwargs = {"outline": self.line_color.get(),
+                                                         "width": float(self.line_width.get()),
+                                                         "name": self.canvas.canvas_objects[self.index].kwargs["name"]}
+

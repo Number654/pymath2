@@ -126,7 +126,7 @@ class GeometryCanvas:
                 y_posted = post_cell(event.y, cellsize=cell_size)
             c_obj = CanvasObject(figure_codes[figure], (begin_x_posted, begin_y_posted, x_posted, y_posted),
                                  outline=self.color_wid.get_line_color(),
-                                 fill=self.color_wid.get_fill_color(), name=figure_name)
+                                 fill=self.color_wid.get_fill_color(), width=1, name=figure_name)
             self.canvas_objects.append(c_obj)
             self.shape_manager.add(c_obj)
             self.now_figures += 1  # Увеличиваем количество фигур
