@@ -189,21 +189,24 @@ class GeometryCanvas:
                 if 'outline' not in canvas_object.kwargs.keys():
                     if canvas_object.kwargs['fill'] is None:
                         figures.append(CanvasObject(canvas_object.figure, canvas_object.args[0],
-                                                    fill='',
+                                                    fill='', width=canvas_object.kwargs["width"],
                                                     tag=canvas_object.kwargs['name']))
                     else:
                         figures.append(CanvasObject(canvas_object.figure, canvas_object.args[0],
                                                     fill=canvas_object.kwargs['fill'],
+                                                    width=canvas_object.kwargs["width"],
                                                     tag=canvas_object.kwargs['name']))
                 else:
                     if canvas_object.kwargs['fill'] is None:
                         figures.append(CanvasObject(canvas_object.figure, canvas_object.args[0],
                                                     fill='', outline=canvas_object.kwargs['outline'],
+                                                    width=canvas_object.kwargs["width"],
                                                     tag=canvas_object.kwargs['name']))
                     else:
                         figures.append(CanvasObject(canvas_object.figure, canvas_object.args[0],
                                                     fill=canvas_object.kwargs['fill'],
                                                     outline=canvas_object.kwargs['outline'],
+                                                    width=canvas_object.kwargs["width"],
                                                     tag=canvas_object.kwargs['name']))
             return figures
 

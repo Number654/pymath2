@@ -5,7 +5,7 @@ from tkinter import Button as ColorButton
 from tkinter.ttk import Button, Checkbutton, Entry
 from tkinter.messagebox import showwarning
 
-from .canvas_object import CanvasObject
+from core.pymath import better_divmod
 
 
 shape_names = {"line": "Отрезок", "rectangle": "Прямоугольник",
@@ -71,28 +71,32 @@ class ShapeManager:
         self.shapes.pop(index)
         for i, sh in enumerate(self.shapes, 1):
             self.shapes_list.insert("end", str(i) + ". " + shape_names[sh.figure])
+        self.shape_wizard.destroy_shape_view()  # Убираем и настройщик фигуры - ведь она уже удалена
 
     def clear(self):
         self.shapes = []
         self.shapes_list.delete(0, "end")
 
+    # Режим показа фиугы на холсте при выделении ее в списке
     def show_mode(self):
-        if self.show_one_mode.get():
-            self.canvas.shape_selector.set(-1)
-            self.canvas.shape_selector.disable()
-            self.canvas.showed_now = []
-            self.canvas.update()
-            self.show_shape_on_canvas(None)
-        else:
+        if self.show_one_mode.get():  # Если флажок выделен, то
+            self.canvas.shape_selector.set(-1)  # Отключаем рисование фигур
+            self.canvas.shape_selector.disable()  # И отключаем сам виджет
+            self.canvas.showed_now = []  # Подготавливаем переменную показа на холсте
+            self.canvas.update()  # Обновляем холст, тем самым временно стрирая все остальные фигуры
+            self.show_shape_on_canvas(None)  # Показываем выдеоенную сейчас фигуру
+        else:  # Иначе делаем все наоборот: включаем виджет рисования фигур и т. д.
             self.canvas.showed_now = None
             self.canvas.shape_selector.enable()
 
+    # Показать фигуру на холсте при выделении ее в списке
     def show_shape_on_canvas(self, event):
         selected = self.shapes_list.curselection()
-        if selected:
-            if self.show_one_mode.get():
-                self.canvas.showed_now = [self.canvas.canvas_objects[selected[0]]]
-            self.shape_wizard.show_shape_view(selected[0])
+        if selected:  # Если фигура выделена
+            if self.show_one_mode.get():  # Если включен режим показа по одной фигуре,
+                self.canvas.showed_now = [self.canvas.canvas_objects[selected[0]]]  # То отмечаем выделенную фигуру
+            self.shape_wizard.show_shape_view(selected[0])  # Показываем настройщик для выделенной фигуры
+        return event
 
 
 class Wizard:
@@ -111,7 +115,7 @@ class Wizard:
         self.frame = Frame(self.master, width=158, height=137, bd=2, relief="groove")
         self.shape_view = ShapeView(self.frame)  # Фрейм с виджетами настройки выделенной фигуры
 
-        self.apply_button = Button(self.frame, width=23, text="Применить")
+        self.apply_button = Button(self.frame, width=23, text="Применить", state="disabled")
 
     def place(self, x=0, y=0):
         self.frame.place(x=x, y=y)
@@ -126,7 +130,11 @@ class Wizard:
             self.shape_view = LineView(self.frame, self.canvas, sel_index)
             self.shape_view.place(x=1, y=1)
             self.shape_view.set()
-            self.apply_button.config(command=self.shape_view.apply)
+            self.apply_button.config(command=self.shape_view.apply, state="normal")
+
+    def destroy_shape_view(self):
+        self.shape_view.destroy()
+        self.apply_button.config(command=None, state="disabled")
 
 
 class ShapeView:
@@ -199,16 +207,30 @@ class LineView(ShapeView):
         self.y2_entry.place(x=122, y=75)
 
     def set(self):
+        if not self.canvas.pixel_mode_flag.get():
+            cell_size = self.canvas.cell_size_wid.get()
+        else:
+            cell_size = 1
+
         self.line_width.set(str(self.canvas.canvas_objects[self.index].kwargs["width"]))
-        self.x1.set(str(round(self.canvas.canvas_objects[self.index].args[0][0], 2)))
-        self.y1.set(str(round(self.canvas.canvas_objects[self.index].args[0][1], 2)))
-        self.x2.set(str(round(self.canvas.canvas_objects[self.index].args[0][2], 2)))
-        self.y2.set(str(round(self.canvas.canvas_objects[self.index].args[0][3], 2)))
+        self.x1.set(str(round(better_divmod(self.canvas.canvas_objects[self.index].args[0][0], cell_size)[0], 2)))
+        self.y1.set(str(round(better_divmod(self.canvas.height-self.canvas.canvas_objects[self.index].args[0][1],
+                                            cell_size)[0], 2)))
+        self.x2.set(str(round(better_divmod(self.canvas.canvas_objects[self.index].args[0][2], cell_size)[0], 2)))
+        self.y2.set(str(round(better_divmod(self.canvas.height-self.canvas.canvas_objects[self.index].args[0][3],
+                                            cell_size)[0], 2)))
 
     def apply(self):
-        self.canvas.canvas_objects[self.index].args = ((float(self.x1.get()), float(self.y1.get()),
-                                                        float(self.x2.get()), float(self.y2.get())),)
-        self.canvas.canvas_objects[self.index].kwargs = {"outline": self.line_color.get(),
+        if not self.canvas.pixel_mode_flag.get():
+            cell_size = self.canvas.cell_size_wid.get()
+        else:
+            cell_size = 1
+
+        self.canvas.canvas_objects[self.index].args = ((float(self.x1.get())*cell_size,
+                                                        (self.canvas.height//cell_size-float(self.y1.get()))*cell_size,
+                                                        float(self.x2.get())*cell_size,
+                                                        (self.canvas.height//cell_size-float(self.y2.get()))*cell_size),
+                                                       )
+        self.canvas.canvas_objects[self.index].kwargs = {"fill": self.line_color.get(),
                                                          "width": float(self.line_width.get()),
                                                          "name": self.canvas.canvas_objects[self.index].kwargs["name"]}
-

@@ -95,6 +95,8 @@ def figures2png(figures, path):
 
     # Проходимя по фигурам
     for figure in figures:
+        outline = ""
+
         # Если у фигуры нет заливки (заливка прозрачная), то ставим полную прозрачность
         if not figure.kwargs['fill']:
             fill = (0, 0, 0, 0)
@@ -110,10 +112,10 @@ def figures2png(figures, path):
         # figure.args - это координаты
         # figure.figure - это тип фигуры
         if figure.figure == "line":
-            draw.line(xy=figure.args[0], fill=outline)
+            print(figure.kwargs)
+            draw.line(xy=figure.args[0], fill=fill, width=round(figure.kwargs["width"]))
         # Если прямоугольник, то рисуем прямоугольник без заливки по координатам
         if figure.figure == "rectangle":
-            print(figure.args[0], fill, outline)
             draw.rectangle(xy=figure.args[0], fill=fill, outline=outline)
         if figure.figure == "circle":
             draw.ellipse(xy=figure.args[0], fill=fill, outline=outline)
