@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from tkinter import Frame, Listbox, Label, IntVar, StringVar
-from tkinter import Button as ColorButton
 from tkinter.ttk import Button, Checkbutton, Entry
 from tkinter.messagebox import showwarning
 
 from core.pymath import better_divmod
+from .color_button import ColorButton
+from .mouse import post_cell
 
 
 shape_names = {"line": "Отрезок", "rectangle": "Прямоугольник",
@@ -76,6 +77,7 @@ class ShapeManager:
     def clear(self):
         self.shapes = []
         self.shapes_list.delete(0, "end")
+        self.shape_wizard.destroy_shape_view()
 
     # Режим показа фиугы на холсте при выделении ее в списке
     def show_mode(self):
@@ -152,6 +154,11 @@ class ShapeView:
         self.canvas = canvas
         self.index = index
 
+        self.x1 = StringVar()
+        self.y1 = StringVar()
+        self.x2 = StringVar()
+        self.y2 = StringVar()
+
         self.frame = Frame(self.master, width=148, height=100)
 
     def place(self, x=0, y=0):
@@ -160,11 +167,30 @@ class ShapeView:
     def destroy(self):
         self.frame.destroy()
 
+    def get_cell_size(self):
+        if not self.canvas.pixel_mode_flag.get():
+            return self.canvas.cell_size_wid.get()
+        return 1
+
     def set(self):
-        pass
+        cell_size = self.get_cell_size()
+
+        self.x1.set(str(better_divmod(self.canvas.canvas_objects[self.index].args[0][0], cell_size)[0]))
+        self.y1.set(str(better_divmod(self.canvas.height - self.canvas.canvas_objects[self.index].args[0][1],
+                                      cell_size)[0]))
+        self.x2.set(str(better_divmod(self.canvas.canvas_objects[self.index].args[0][2], cell_size)[0]))
+        self.y2.set(str(better_divmod(self.canvas.height - self.canvas.canvas_objects[self.index].args[0][3],
+                                      cell_size)[0]))
 
     def apply(self):
-        pass
+        cell_size = self.get_cell_size()
+        self.canvas.canvas_objects[self.index].args = ((float(self.x1.get()) * cell_size,
+                                                        (self.canvas.height // cell_size - float(
+                                                            self.y1.get())) * cell_size,
+                                                        float(self.x2.get()) * cell_size,
+                                                        (self.canvas.height // cell_size - float(
+                                                            self.y2.get())) * cell_size),
+                                                       )
 
 
 class LineView(ShapeView):
@@ -172,16 +198,9 @@ class LineView(ShapeView):
     def __init__(self, master, canvas, index):
         super().__init__(master, canvas=canvas,
                          index=index)
-
         self.line_width = StringVar()
-        self.line_color = StringVar()
-        self.x1 = StringVar()
-        self.y1 = StringVar()
-        self.x2 = StringVar()
-        self.y2 = StringVar()
 
-        self.color_btn = ColorButton(self.frame, text="█", bg="white", relief="flat",
-                                     activebackground="white")
+        self.color_btn = ColorButton(self.frame)
         self.line_width_entry = Entry(self.frame, textvariable=self.line_width, width=7)
         self.x1_entry = Entry(self.frame, textvariable=self.x1, width=3)
         self.y1_entry = Entry(self.frame, textvariable=self.y1, width=3)
@@ -195,8 +214,6 @@ class LineView(ShapeView):
         Label(self.frame, text="X2:").place(x=82, y=50)
         Label(self.frame, text="Y2:").place(x=122, y=50)
 
-        self.line_color.set("black")
-
     def place(self, x=0, y=0):
         super().place(x=x, y=y)
         self.color_btn.place(x=7, y=22)
@@ -207,30 +224,11 @@ class LineView(ShapeView):
         self.y2_entry.place(x=122, y=75)
 
     def set(self):
-        if not self.canvas.pixel_mode_flag.get():
-            cell_size = self.canvas.cell_size_wid.get()
-        else:
-            cell_size = 1
-
+        super().set()
         self.line_width.set(str(self.canvas.canvas_objects[self.index].kwargs["width"]))
-        self.x1.set(str(round(better_divmod(self.canvas.canvas_objects[self.index].args[0][0], cell_size)[0], 2)))
-        self.y1.set(str(round(better_divmod(self.canvas.height-self.canvas.canvas_objects[self.index].args[0][1],
-                                            cell_size)[0], 2)))
-        self.x2.set(str(round(better_divmod(self.canvas.canvas_objects[self.index].args[0][2], cell_size)[0], 2)))
-        self.y2.set(str(round(better_divmod(self.canvas.height-self.canvas.canvas_objects[self.index].args[0][3],
-                                            cell_size)[0], 2)))
 
     def apply(self):
-        if not self.canvas.pixel_mode_flag.get():
-            cell_size = self.canvas.cell_size_wid.get()
-        else:
-            cell_size = 1
-
-        self.canvas.canvas_objects[self.index].args = ((float(self.x1.get())*cell_size,
-                                                        (self.canvas.height//cell_size-float(self.y1.get()))*cell_size,
-                                                        float(self.x2.get())*cell_size,
-                                                        (self.canvas.height//cell_size-float(self.y2.get()))*cell_size),
-                                                       )
-        self.canvas.canvas_objects[self.index].kwargs = {"fill": self.line_color.get(),
+        super().apply()
+        self.canvas.canvas_objects[self.index].kwargs = {"fill": self.color_btn.get_color(),
                                                          "width": float(self.line_width.get()),
                                                          "name": self.canvas.canvas_objects[self.index].kwargs["name"]}

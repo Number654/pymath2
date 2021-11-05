@@ -2,7 +2,6 @@
 
 from tkinter.ttk import Radiobutton
 from time import sleep
-from core import better_divmod
 from graphics.graphics_canvas import *
 from graphics.cellsize import *
 from graphics.color import *
@@ -39,8 +38,6 @@ canvas.draw_net()
 shape_mgr.set_canvas(canvas)  # Задаем холст для виджета управления фигурами
 
 cwg.place(x=625, y=21)
-cwg.enable_fill()
-
 csw.place(x=625, y=121)
 
 # Кнопки экспорта, импорта, сохраниния изменений рисунка
