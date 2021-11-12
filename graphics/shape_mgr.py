@@ -6,7 +6,6 @@ from tkinter.messagebox import showwarning
 
 from core.pymath import better_divmod
 from .color_button import ColorButton
-from .mouse import post_cell
 
 
 shape_names = {"line": "Отрезок", "rectangle": "Прямоугольник",
@@ -130,16 +129,25 @@ class Wizard:
         c_obj = self.canvas.canvas_objects[sel_index]
         if c_obj.figure == "line":
             self.shape_view = LineView(self.frame, self.canvas, sel_index)
-            self.shape_view.place(x=1, y=1)
-            self.shape_view.set()
-            self.apply_button.config(command=self.shape_view.apply, state="normal")
+        elif c_obj.figure == "rectangle":
+            self.shape_view = RectView(self.frame, self.canvas, sel_index)
+        elif c_obj.figure == "circle":
+            self.shape_view = CircleView(self.frame, self.canvas, sel_index)
+        elif c_obj.figure == "text":
+            self.shape_view = TextView(self.frame, self.canvas, sel_index)
+        else:
+            raise RuntimeError("Unknown shape type: %s." % c_obj.figure)
+
+        self.shape_view.place(x=1, y=1)
+        self.shape_view.set()
+        self.apply_button.config(command=self.shape_view.apply, state="normal")
 
     def destroy_shape_view(self):
         self.shape_view.destroy()
         self.apply_button.config(command=None, state="disabled")
 
 
-class ShapeView:
+class SuperShapeView:
 
     """
     Данный класс и его подклассы используются
@@ -156,13 +164,16 @@ class ShapeView:
 
         self.x1 = StringVar()
         self.y1 = StringVar()
-        self.x2 = StringVar()
-        self.y2 = StringVar()
 
         self.frame = Frame(self.master, width=148, height=100)
 
+        self.x1_entry = Entry(self.frame, textvariable=self.x1, width=3)
+        self.y1_entry = Entry(self.frame, textvariable=self.y1, width=3)
+
     def place(self, x=0, y=0):
         self.frame.place(x=x, y=y)
+        self.x1_entry.place(x=2, y=75)
+        self.y1_entry.place(x=42, y=75)
 
     def destroy(self):
         self.frame.destroy()
@@ -178,34 +189,57 @@ class ShapeView:
         self.x1.set(str(better_divmod(self.canvas.canvas_objects[self.index].args[0][0], cell_size)[0]))
         self.y1.set(str(better_divmod(self.canvas.height - self.canvas.canvas_objects[self.index].args[0][1],
                                       cell_size)[0]))
+
+    def apply(self):
+        cell_size = self.get_cell_size()
+        self.canvas.canvas_objects[self.index].args = (float(self.x1.get().replace(",", ".")) * cell_size,
+                                                       (self.canvas.height // cell_size - float(
+                                                        self.y1.get().replace(",", "."))) * cell_size,
+                                                       )
+
+
+class ShapeView(SuperShapeView):
+
+    def __init__(self, master, canvas=None, index=None):
+        super().__init__(master, canvas=canvas, index=index)
+        self.line_width = StringVar()
+        self.x2 = StringVar()
+        self.y2 = StringVar()
+
+        self.line_width_entry = Entry(self.frame, textvariable=self.line_width, width=7)
+        self.x2_entry = Entry(self.frame, textvariable=self.x2, width=3)
+        self.y2_entry = Entry(self.frame, textvariable=self.y2, width=3)
+
+    def place(self, x=0, y=0):
+        super().place(x=x, y=y)
+        self.x2_entry.place(x=82, y=75)
+        self.y2_entry.place(x=122, y=75)
+
+    def set(self):
+        super().set()
+        cell_size = self.get_cell_size()
+
+        self.line_width.set(str(self.canvas.canvas_objects[self.index].kwargs["width"]))
         self.x2.set(str(better_divmod(self.canvas.canvas_objects[self.index].args[0][2], cell_size)[0]))
         self.y2.set(str(better_divmod(self.canvas.height - self.canvas.canvas_objects[self.index].args[0][3],
                                       cell_size)[0]))
 
     def apply(self):
         cell_size = self.get_cell_size()
-        self.canvas.canvas_objects[self.index].args = ((float(self.x1.get()) * cell_size,
+        self.canvas.canvas_objects[self.index].args = ((float(self.x1.get().replace(",", ".")) * cell_size,
                                                         (self.canvas.height // cell_size - float(
-                                                            self.y1.get())) * cell_size,
-                                                        float(self.x2.get()) * cell_size,
+                                                            self.y1.get().replace(",", "."))) * cell_size,
+                                                        float(self.x2.get().replace(",", ".")) * cell_size,
                                                         (self.canvas.height // cell_size - float(
-                                                            self.y2.get())) * cell_size),
+                                                            self.y2.get().replace(",", "."))) * cell_size),
                                                        )
 
 
 class LineView(ShapeView):
 
     def __init__(self, master, canvas, index):
-        super().__init__(master, canvas=canvas,
-                         index=index)
-        self.line_width = StringVar()
-
+        super().__init__(master, canvas=canvas, index=index)
         self.color_btn = ColorButton(self.frame)
-        self.line_width_entry = Entry(self.frame, textvariable=self.line_width, width=7)
-        self.x1_entry = Entry(self.frame, textvariable=self.x1, width=3)
-        self.y1_entry = Entry(self.frame, textvariable=self.y1, width=3)
-        self.x2_entry = Entry(self.frame, textvariable=self.x2, width=3)
-        self.y2_entry = Entry(self.frame, textvariable=self.y2, width=3)
 
         Label(self.frame, text="Цвет:").place(x=2, y=1)
         Label(self.frame, text="Толщина:").place(x=50, y=1)
@@ -214,21 +248,78 @@ class LineView(ShapeView):
         Label(self.frame, text="X2:").place(x=82, y=50)
         Label(self.frame, text="Y2:").place(x=122, y=50)
 
+    def set(self):
+        super().set()
+        self.color_btn.set_color(self.canvas.canvas_objects[self.index].kwargs["outline"])
+
     def place(self, x=0, y=0):
         super().place(x=x, y=y)
         self.color_btn.place(x=7, y=22)
         self.line_width_entry.place(x=55, y=22)
-        self.x1_entry.place(x=2, y=75)
-        self.y1_entry.place(x=42, y=75)
-        self.x2_entry.place(x=82, y=75)
-        self.y2_entry.place(x=122, y=75)
+
+    def apply(self):
+        super().apply()
+        self.canvas.canvas_objects[self.index].kwargs = {"outline": self.color_btn.get_color(),
+                                                         "width": float(self.line_width.get()),
+                                                         "name": self.canvas.canvas_objects[self.index].kwargs["name"]}
+
+
+class RectView(ShapeView):
+
+    def __init__(self, master, canvas, index):
+        super().__init__(master, canvas=canvas, index=index)
+        self.outline_color_button = ColorButton(self.frame)
+        self.fill_color_button = ColorButton(self.frame, chooser_title="Цвет заливки",
+                                             transparent_if_cancel=True)
+
+        Label(self.frame, text="Цвет\nлинии:", font="Tahoma 8").place(x=-1, y=-4)
+        Label(self.frame, text="Цвет\nзаливки:", font="Tahoma 8").place(x=45, y=-4)
+        Label(self.frame, text="Толщина:", font="Tahoma 8").place(x=97, y=1)
+        Label(self.frame, text="X1:").place(x=2, y=50)
+        Label(self.frame, text="Y1:").place(x=42, y=50)
+        Label(self.frame, text="X2:").place(x=82, y=50)
+        Label(self.frame, text="Y2:").place(x=122, y=50)
+
+    def place(self, x=0, y=0):
+        super().place(x=x, y=y)
+        self.outline_color_button.place(x=7, y=26)
+        self.fill_color_button.place(x=59, y=26)
 
     def set(self):
         super().set()
-        self.line_width.set(str(self.canvas.canvas_objects[self.index].kwargs["width"]))
+        self.outline_color_button.set_color(self.canvas.canvas_objects[self.index].kwargs["outline"])
+        self.fill_color_button.set_color(self.canvas.canvas_objects[self.index].kwargs["fill"])
+
+    def apply(self):
+        super().apply()
+        self.canvas.canvas_objects[self.index].kwargs = {"outline": self.outline_color_button.get_color(),
+                                                         "fill": self.fill_color_button.get_color(),
+                                                         "width": float(self.line_width.get()),
+                                                         "name": self.canvas.canvas_objects[self.index].kwargs["name"]}
+
+
+class CircleView(RectView):
+    pass
+
+
+class TextView(SuperShapeView):
+
+    def __init__(self, master, canvas, index):
+        super().__init__(master, canvas=canvas, index=index)
+        self.text_var = StringVar()
+
+        self.color_btn = ColorButton(self.frame)
+        self.text_entry = Entry(self.frame, width=10, textvariable=self.text_var)
+
+    def place(self, x=0, y=0):
+        super().place(x=x, y=y)
+        self.text_entry.place(x=97, y=75)
+
+    def set(self):
+        super().set()
+        self.color_btn.set_color(self.canvas.canvas_objects[self.index].kwargs["fill"])
 
     def apply(self):
         super().apply()
         self.canvas.canvas_objects[self.index].kwargs = {"fill": self.color_btn.get_color(),
-                                                         "width": float(self.line_width.get()),
                                                          "name": self.canvas.canvas_objects[self.index].kwargs["name"]}

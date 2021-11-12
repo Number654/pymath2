@@ -8,6 +8,7 @@ class CellSizeWidget:
 
     def __init__(self, master, width, height, cell_size=18.8787):
         self.master = master
+        self.canvas = None
         self.x = 0
         self.y = 0
         self.width = width
@@ -22,6 +23,10 @@ class CellSizeWidget:
 
         self.change_btn.place(x=5, y=35)
         self.size_label.place(x=1, y=0)
+
+    # Вызов метода обязателен!
+    def set_canvas(self, canvas):
+        self.canvas = canvas
 
     # Метод для размещения виджета на окне по координатам, указанным в __init__
     def place(self, x=0, y=0):
@@ -47,6 +52,8 @@ class CellSizeWidget:
 
     # Метод вызова диалога изменения размера клетки
     def change_cell_size(self):
+        self.canvas.shape_selector.set(-1)
+
         dialog = Toplevel(self.master)
         dialog.title('Размер клетки')
         # Уставнавливаем размер окна диалога и "делаем окно диалогом"

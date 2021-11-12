@@ -45,11 +45,14 @@ class TextSpawner:
 
     # Диалог
     def spawn(self):
+        self.canvas.shape_selector.set(-1)
+
         dialog = Toplevel(self.master)
         dialog.transient(self.master)
         dialog.title("Вставка текста")
         dialog.geometry("180x100")
         dialog.resizable(0, 0)
+        dialog.grab_set()
         dialog.focus_set()
 
         entry_var = StringVar()

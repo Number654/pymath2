@@ -33,8 +33,8 @@ class ColorWidget:
         self.x = x
         self.y = y
         self.frame.place(x=self.x, y=self.y)
-        self.line_color_button.place(x=35, y=20)
-        self.fill_color_button.place(x=35, y=60)
+        self.line_color_button.place(x=33, y=20)
+        self.fill_color_button.place(x=33, y=60)
 
     def get_line_color(self):
         return self.line_color_button.get_color()
@@ -45,10 +45,8 @@ class ColorWidget:
 
 def main():
     tk = Tk()
-
     cwg = ColorWidget(tk, 91, 95)
     cwg.place(10, 10)
-
     tk.mainloop()
 
 

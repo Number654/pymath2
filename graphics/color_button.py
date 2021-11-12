@@ -4,6 +4,10 @@ from tkinter import Button, StringVar
 from tkinter.colorchooser import askcolor
 
 
+SOLID = "⬛"
+TRANSPARENT = "⬜"
+
+
 # Вызвать диалог выбора цвета
 def call(title):
     return askcolor(title=title)[1]
@@ -28,8 +32,8 @@ class ColorButton:
         self.transparency = transparent_if_cancel
         self.color_var = StringVar()
 
-        self.button = Button(self.master, text="█" if not self.transparency else "□", bg="white",
-                             activebackground="white", relief="flat", command=self.call_chooser)
+        self.button = Button(self.master, text=SOLID if not self.transparency else TRANSPARENT, bg="white",
+                             activebackground="white", relief="flat", bd=0, command=self.call_chooser)
         self.set_color("black")
 
     def place(self, x=0, y=0):
@@ -45,9 +49,9 @@ class ColorButton:
         if value is None:
             if not self.transparency:
                 return
-            self.button.config(text="□", fg="black", activeforeground="black")
+            self.button.config(text=TRANSPARENT, fg="black", activeforeground="black")
         else:
-            self.button.config(text="█", fg=value, activeforeground=value)
+            self.button.config(text=SOLID, fg=value, activeforeground=value)
         self.color_var.set(value)
 
     def call_chooser(self):

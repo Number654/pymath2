@@ -36,6 +36,7 @@ canvas.place(x=19, y=20)
 canvas.draw_net()
 
 shape_mgr.set_canvas(canvas)  # Задаем холст для виджета управления фигурами
+csw.set_canvas(canvas)
 
 cwg.place(x=625, y=21)
 csw.place(x=625, y=121)
@@ -99,7 +100,7 @@ while canvas.is_running:
     # Отрисовываем ранее созданные фигуры
     for i in canvas.canvas_objects if canvas.showed_now is None else canvas.showed_now:
         if i.figure == "line":
-            canvas.draw_line(*i.args, fill=i.kwargs["fill"], width=i.kwargs["width"], tag=i.kwargs["name"])
+            canvas.draw_line(*i.args, fill=i.kwargs["outline"], width=i.kwargs["width"], tag=i.kwargs["name"])
         if i.figure == "rectangle":
             canvas.draw_rectangle(*i.args, fill=i.kwargs["fill"], outline=i.kwargs["outline"],
                                   tag=i.kwargs["name"])
