@@ -102,10 +102,10 @@ while canvas.is_running:
         if i.figure == "line":
             canvas.draw_line(*i.args, fill=i.kwargs["outline"], width=i.kwargs["width"], tag=i.kwargs["name"])
         if i.figure == "rectangle":
-            canvas.draw_rectangle(*i.args, fill=i.kwargs["fill"], outline=i.kwargs["outline"],
+            canvas.draw_rectangle(*i.args, fill=i.kwargs["fill"], width=i.kwargs["width"], outline=i.kwargs["outline"],
                                   tag=i.kwargs["name"])
         if i.figure == "circle":
-            canvas.draw_circle(*i.args, fill=i.kwargs["fill"], outline=i.kwargs["outline"],
+            canvas.draw_circle(*i.args, fill=i.kwargs["fill"], width=i.kwargs["width"], outline=i.kwargs["outline"],
                                tag=i.kwargs["name"])
         if i.figure == "text":
             canvas.write_text(*i.args, fill=i.kwargs["fill"], text=i.kwargs["text"],

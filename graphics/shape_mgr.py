@@ -212,6 +212,7 @@ class ShapeView(SuperShapeView):
 
     def place(self, x=0, y=0):
         super().place(x=x, y=y)
+        self.line_width_entry.place(x=100, y=26)
         self.x2_entry.place(x=82, y=75)
         self.y2_entry.place(x=122, y=75)
 
