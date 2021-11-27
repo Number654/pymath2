@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from tkinter import Frame, Listbox, Label, IntVar, StringVar
+from tkinter import Frame, Listbox, Label, IntVar, StringVar, BooleanVar
 from tkinter.ttk import Button, Checkbutton, Entry
-from tkinter.messagebox import showwarning
+from tkinter import Checkbutton as OldCheckButton
 
 from core.pymath import better_divmod
 from .color_button import ColorButton
@@ -210,6 +210,11 @@ class ShapeView(SuperShapeView):
         self.x2_entry = Entry(self.frame, textvariable=self.x2, width=3)
         self.y2_entry = Entry(self.frame, textvariable=self.y2, width=3)
 
+        Label(self.frame, text="X1:").place(x=2, y=50)
+        Label(self.frame, text="Y1:").place(x=42, y=50)
+        Label(self.frame, text="X2:").place(x=82, y=50)
+        Label(self.frame, text="Y2:").place(x=122, y=50)
+
     def place(self, x=0, y=0):
         super().place(x=x, y=y)
         self.line_width_entry.place(x=100, y=26)
@@ -244,10 +249,6 @@ class LineView(ShapeView):
 
         Label(self.frame, text="Цвет:").place(x=2, y=1)
         Label(self.frame, text="Толщина:").place(x=50, y=1)
-        Label(self.frame, text="X1:").place(x=2, y=50)
-        Label(self.frame, text="Y1:").place(x=42, y=50)
-        Label(self.frame, text="X2:").place(x=82, y=50)
-        Label(self.frame, text="Y2:").place(x=122, y=50)
 
     def set(self):
         super().set()
@@ -261,7 +262,7 @@ class LineView(ShapeView):
     def apply(self):
         super().apply()
         self.canvas.canvas_objects[self.index].kwargs = {"outline": self.color_btn.get_color(),
-                                                         "width": float(self.line_width.get()),
+                                                         "width": float(self.line_width.get().replace(",", ".")),
                                                          "name": self.canvas.canvas_objects[self.index].kwargs["name"]}
 
 
@@ -276,10 +277,6 @@ class RectView(ShapeView):
         Label(self.frame, text="Цвет\nлинии:", font="Tahoma 8").place(x=-1, y=-4)
         Label(self.frame, text="Цвет\nзаливки:", font="Tahoma 8").place(x=45, y=-4)
         Label(self.frame, text="Толщина:", font="Tahoma 8").place(x=97, y=1)
-        Label(self.frame, text="X1:").place(x=2, y=50)
-        Label(self.frame, text="Y1:").place(x=42, y=50)
-        Label(self.frame, text="X2:").place(x=82, y=50)
-        Label(self.frame, text="Y2:").place(x=122, y=50)
 
     def place(self, x=0, y=0):
         super().place(x=x, y=y)
@@ -295,7 +292,7 @@ class RectView(ShapeView):
         super().apply()
         self.canvas.canvas_objects[self.index].kwargs = {"outline": self.outline_color_button.get_color(),
                                                          "fill": self.fill_color_button.get_color(),
-                                                         "width": float(self.line_width.get()),
+                                                         "width": float(self.line_width.get().replace(",", ".")),
                                                          "name": self.canvas.canvas_objects[self.index].kwargs["name"]}
 
 
@@ -309,18 +306,45 @@ class TextView(SuperShapeView):
         super().__init__(master, canvas=canvas, index=index)
         self.text_var = StringVar()
 
+        self.bold = BooleanVar()
+        self.italic = BooleanVar()
+        self.underline = BooleanVar()
+
         self.color_btn = ColorButton(self.frame)
         self.text_entry = Entry(self.frame, width=10, textvariable=self.text_var)
+        self.bold_btn = OldCheckButton(self.frame, text="B", font="Times 11 bold", indicatoron=0,
+                                       variable=self.bold)
+        self.italic_btn = OldCheckButton(self.frame, text="I", font="Times 11 italic", indicatoron=0,
+                                         variable=self.italic)
+        self.underline_btn = OldCheckButton(self.frame, text="U", font="Times 11 underline", indicatoron=0,
+                                            variable=self.underline)
+
+        Label(self.frame, text="X:").place(x=2, y=50)
+        Label(self.frame, text="Y:").place(x=42, y=50)
+        Label(self.frame, text="Текст:").place(x=82, y=50)
+        Label(self.frame, text="Шрифт:").place(x=2, y=1)
 
     def place(self, x=0, y=0):
         super().place(x=x, y=y)
-        self.text_entry.place(x=97, y=75)
+        self.text_entry.place(x=80, y=75)
+        self.bold_btn.place(x=2, y=21)
+        self.italic_btn.place(x=37, y=21)
+        self.underline_btn.place(x=62, y=21)
 
     def set(self):
         super().set()
+        self.text_var.set(self.canvas.canvas_objects[self.index].kwargs["text"])
         self.color_btn.set_color(self.canvas.canvas_objects[self.index].kwargs["fill"])
+        self.bold.set(bool(self.canvas.canvas_objects[self.index].kwargs["bold"]))
+        self.italic.set(bool(self.canvas.canvas_objects[self.index].kwargs["italic"]))
+        self.underline.set(bool(self.canvas.canvas_objects[self.index].kwargs["underline"]))
 
     def apply(self):
         super().apply()
         self.canvas.canvas_objects[self.index].kwargs = {"fill": self.color_btn.get_color(),
+                                                         "text": self.text_var.get(),
+                                                         "font": "Verdana 10",
+                                                         "bold": self.bold.get(),
+                                                         "italic": self.italic.get(),
+                                                         "underline": self.underline.get(),
                                                          "name": self.canvas.canvas_objects[self.index].kwargs["name"]}

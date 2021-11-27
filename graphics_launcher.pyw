@@ -108,8 +108,10 @@ while canvas.is_running:
             canvas.draw_circle(*i.args, fill=i.kwargs["fill"], width=i.kwargs["width"], outline=i.kwargs["outline"],
                                tag=i.kwargs["name"])
         if i.figure == "text":
+            font = ""
             canvas.write_text(*i.args, fill=i.kwargs["fill"], text=i.kwargs["text"],
-                              font="Verdana 10", anchor=NW)
+                              font=i.kwargs["font"],
+                              tag=i.kwargs["name"], anchor=NW)
 
     # Процесс рисования фигуры продолжается до отпускания левой кнопки мыши:
     if drawing_now != -1 and not \

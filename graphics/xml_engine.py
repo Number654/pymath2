@@ -95,30 +95,24 @@ def figures2png(figures, path):
 
     # Проходимя по фигурам
     for figure in figures:
-        outline = ""
-
         # Если у фигуры нет заливки (заливка прозрачная), то ставим полную прозрачность
         if not figure.kwargs['fill']:
             fill = (0, 0, 0, 0)
         # Иначе, ставим нужную заливку
         else:
             fill = ImageColor.getcolor(figure.kwargs['fill'], "RGBA")
-        # Цвет линии обозначается параметром "fill", а outline в таком случае - пустая строка
-        if "outline" not in figure.kwargs.keys():
-            fill = figure.kwargs['fill']
-        else:
-            outline = figure.kwargs['outline']
+
+        outline = figure.kwargs['outline']
         # Если линия, рисуем линию по координатам
         # figure.args - это координаты
         # figure.figure - это тип фигуры
         if figure.figure == "line":
-            print(figure.kwargs)
-            draw.line(xy=figure.args[0], fill=fill, width=round(figure.kwargs["width"]))
+            draw.line(xy=figure.args[0], fill=figure.kwargs["outline"], width=round(figure.kwargs["width"]))
         # Если прямоугольник, то рисуем прямоугольник без заливки по координатам
         if figure.figure == "rectangle":
-            draw.rectangle(xy=figure.args[0], fill=fill, outline=outline)
+            draw.rectangle(xy=figure.args[0], fill=fill, outline=outline, width=round(figure.kwargs["width"]))
         if figure.figure == "circle":
-            draw.ellipse(xy=figure.args[0], fill=fill, outline=outline)
+            draw.ellipse(xy=figure.args[0], fill=fill, outline=outline, width=round(figure.kwargs["width"]))
         if figure.figure == "text":
             draw.multiline_text(xy=figure.args[0], text=figure.kwargs["text"], fill=fill,
                                 font=image_font)
