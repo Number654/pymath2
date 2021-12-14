@@ -850,9 +850,9 @@ class PeriodicFraction:
     # Перевод в обыкновенную дробь
     def to_ordinary(self):
         k = len(self.period)
+        b = int(self.before_period if not self.is_clean() else 0)
         m = len(self.before_period)
         a = int(self.before_period+self.period)
-        b = int(self.before_period) if self.is_clean() else 0  # Если дробь чиста, то ставим ноль до периода для вычисл.
 
         return Fraction("%s&%s/%s" % (self.int_part, a-b, "9" * k + "0" * m)).reduce()
 
