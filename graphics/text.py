@@ -17,8 +17,11 @@ class TextSpawner:
 
     # Закрыть диалог по нажатии на кнопку "OK"
     def do_spawn(self, dlg, text, coords):
-        font = "Verdana 10"
         figure_name = "text@" + str(round(time()))
+
+        if not all((*coords, text)):  # Если все поля пусты и пользователь нажал на кнопку, это значит "отмена"
+            dlg.destroy()
+            return
 
         # Проверка на корректность введенные координаты
         if isfloat(coords[0]) and isfloat(coords[1]):
@@ -29,12 +32,12 @@ class TextSpawner:
 
             # Пишем текст
             self.canvas.write_text(form_coords, fill=self.canvas.color_wid.get_line_color(),
-                                   text=text, font=font, anchor=NW, tag=figure_name)
+                                   text=text, font="Verdana 10", anchor=NW, tag=figure_name)
 
             # Заносим этот текст в список объектов холста
             c_obj = CanvasObject("text", form_coords, fill=self.canvas.color_wid.get_line_color(),
-                                 text=text, font="Verdana 10", bold=False, italic=False,
-                                 underline=False, name=figure_name)
+                                 text=text, font="Verdana", bold=False, italic=False,
+                                 underline=False, size=10, name=figure_name)
             self.canvas.canvas_objects.append(c_obj)
             self.canvas.shape_manager.add(c_obj)
             self.canvas.now_figures += 1  # Увеличить число фигур - текст тоже учитывается
@@ -55,6 +58,7 @@ class TextSpawner:
         dialog.resizable(0, 0)
         dialog.grab_set()
         dialog.focus_set()
+        dialog.bind_all("<KeyPress-Return>", lambda event: ok_button.invoke())
 
         entry_var = StringVar()
         x_var = StringVar()
@@ -71,3 +75,4 @@ class TextSpawner:
                            command=lambda: self.do_spawn(dialog, entry_var.get(), [x_var.get(),
                                                                                    y_var.get()]))
         ok_button.place(x=93, y=70)
+        my_entry.focus_set()

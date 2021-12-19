@@ -1,15 +1,26 @@
 # -*- coding: utf-8 -*-
 
 from tkinter import Frame, Listbox, Label, IntVar, StringVar, BooleanVar
-from tkinter.ttk import Button, Checkbutton, Entry
 from tkinter import Checkbutton as OldCheckButton
+from tkinter.ttk import Button, Checkbutton, Entry
+from tkinter.messagebox import showwarning
 
 from core.pymath import better_divmod
+from core.fractions import isfloat
 from .color_button import ColorButton
 
 
 shape_names = {"line": "Отрезок", "rectangle": "Прямоугольник",
                "circle": "Окружность", "text": "Надпись"}  # Русскоязычные названия фигур
+
+
+class Spinbox(Entry):
+
+    def __init__(self, master=None, **kw):
+        Entry.__init__(self, master, "ttk::spinbox", **kw)
+
+    def set(self, value):
+        self.tk.call(self._w, "set", value)
 
 
 class ShapeManager:
@@ -85,7 +96,7 @@ class ShapeManager:
             self.canvas.shape_selector.disable()  # И отключаем сам виджет
             self.canvas.showed_now = []  # Подготавливаем переменную показа на холсте
             self.canvas.update()  # Обновляем холст, тем самым временно стрирая все остальные фигуры
-            self.show_shape_on_canvas(None)  # Показываем выдеоенную сейчас фигуру
+            self.show_shape_on_canvas(None)  # Показываем выделенную сейчас фигуру
         else:  # Иначе делаем все наоборот: включаем виджет рисования фигур и т. д.
             self.canvas.showed_now = None
             self.canvas.shape_selector.enable()
@@ -191,10 +202,14 @@ class SuperShapeView:
                                       cell_size)[0]))
 
     def apply(self):
+        x1, y1 = (self.x1.get().replace(",", "."), self.y1.get().replace(",", "."))
+        if not (isfloat(x1) or isfloat(y1)):
+            showwarning("Ошибка", "Введите в качестве координат корректное число")
+            return
+
         cell_size = self.get_cell_size()
-        self.canvas.canvas_objects[self.index].args = (float(self.x1.get().replace(",", ".")) * cell_size,
-                                                       (self.canvas.height // cell_size - float(
-                                                        self.y1.get().replace(",", "."))) * cell_size,
+        self.canvas.canvas_objects[self.index].args = (float(x1) * cell_size,
+                                                       (self.canvas.height // cell_size - float(y1)) * cell_size,
                                                        )
 
 
@@ -231,14 +246,17 @@ class ShapeView(SuperShapeView):
                                       cell_size)[0]))
 
     def apply(self):
+        x1, y1 = (self.x1.get().replace(",", "."), self.y1.get().replace(",", "."))
+        x2, y2 = (self.x2.get().replace(",", "."), self.y2.get().replace(",", "."))
+        if not all((isfloat(x1), isfloat(y1), isfloat(x2), isfloat(y2))):
+            showwarning("Ошибка", "Введите в качестве координат корректное число")
+            return
         cell_size = self.get_cell_size()
-        self.canvas.canvas_objects[self.index].args = ((float(self.x1.get().replace(",", ".")) * cell_size,
-                                                        (self.canvas.height // cell_size - float(
-                                                            self.y1.get().replace(",", "."))) * cell_size,
-                                                        float(self.x2.get().replace(",", ".")) * cell_size,
-                                                        (self.canvas.height // cell_size - float(
-                                                            self.y2.get().replace(",", "."))) * cell_size),
-                                                       )
+        self.canvas.canvas_objects[self.index].args = ((float(x1) * cell_size,
+                                                        (self.canvas.height // cell_size - float(y1) * cell_size),
+                                                        float(x2) * cell_size,
+                                                        (self.canvas.height // cell_size - float(y2) * cell_size),
+                                                        ))
 
 
 class LineView(ShapeView):
@@ -309,6 +327,7 @@ class TextView(SuperShapeView):
         self.bold = BooleanVar()
         self.italic = BooleanVar()
         self.underline = BooleanVar()
+        self.size = StringVar()
 
         self.color_btn = ColorButton(self.frame)
         self.text_entry = Entry(self.frame, width=10, textvariable=self.text_var)
@@ -318,6 +337,8 @@ class TextView(SuperShapeView):
                                          variable=self.italic)
         self.underline_btn = OldCheckButton(self.frame, text="U", font="Times 11 underline", indicatoron=0,
                                             variable=self.underline)
+        self.size_spin = Spinbox(self.master, width=3, font="Tahoma 12", textvariable=self.size,
+                                 from_=1, to=999)
 
         Label(self.frame, text="X:").place(x=2, y=50)
         Label(self.frame, text="Y:").place(x=42, y=50)
@@ -330,6 +351,7 @@ class TextView(SuperShapeView):
         self.bold_btn.place(x=2, y=21)
         self.italic_btn.place(x=37, y=21)
         self.underline_btn.place(x=62, y=21)
+        self.size_spin.place(x=97, y=22)
 
     def set(self):
         super().set()
@@ -338,12 +360,21 @@ class TextView(SuperShapeView):
         self.bold.set(bool(self.canvas.canvas_objects[self.index].kwargs["bold"]))
         self.italic.set(bool(self.canvas.canvas_objects[self.index].kwargs["italic"]))
         self.underline.set(bool(self.canvas.canvas_objects[self.index].kwargs["underline"]))
+        self.size.set(self.canvas.canvas_objects[self.index].kwargs["size"])
 
     def apply(self):
+        size = self.size.get().replace(",", ".")
+        if (not isfloat(size) or (isfloat(size) and float(size) <= 0)) or not size.isdigit():
+            showwarning("Ошибка", "Введите положительное целое значение для размера шрифта")
+            self.size.set(self.canvas.canvas_objects[self.index].kwargs["size"])  # Ставим изначальный размер шрифта
+            return
+
         super().apply()
+        self.canvas.canvas_objects[self.index].args = (self.canvas.canvas_objects[self.index].args,)
         self.canvas.canvas_objects[self.index].kwargs = {"fill": self.color_btn.get_color(),
                                                          "text": self.text_var.get(),
-                                                         "font": "Verdana 10",
+                                                         "font": "Verdana",
+                                                         "size": int(size),
                                                          "bold": self.bold.get(),
                                                          "italic": self.italic.get(),
                                                          "underline": self.underline.get(),

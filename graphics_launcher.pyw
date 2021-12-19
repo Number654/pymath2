@@ -108,9 +108,16 @@ while canvas.is_running:
             canvas.draw_circle(*i.args, fill=i.kwargs["fill"], width=i.kwargs["width"], outline=i.kwargs["outline"],
                                tag=i.kwargs["name"])
         if i.figure == "text":
-            font = ""
+            font = "Verdana " + str(i.kwargs["size"])
+            if i.kwargs["bold"]:
+                font += " bold"
+            if i.kwargs["italic"]:
+                font += " italic"
+            if i.kwargs["underline"]:
+                font += " underline"
+
             canvas.write_text(*i.args, fill=i.kwargs["fill"], text=i.kwargs["text"],
-                              font=i.kwargs["font"],
+                              font=font,
                               tag=i.kwargs["name"], anchor=NW)
 
     # Процесс рисования фигуры продолжается до отпускания левой кнопки мыши:
@@ -150,6 +157,6 @@ while canvas.is_running:
                                outline=canvas.color_wid.get_line_color(), width=1)
         del mouse_pos
 
-    sleep(0.001)
+    sleep(0.0044)
     tk.update_idletasks()
     tk.update()

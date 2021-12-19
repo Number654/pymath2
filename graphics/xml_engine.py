@@ -14,16 +14,7 @@ class GeometryDrawingError(Exception):
 
 # Функция действует как enumerate, только если аргумент не итерируется, то возвращает его с номером 0.
 def new_enumerate(iterable):
-    count = 0
-    result = []
-    try:
-        for v in iterable:
-            result.append((count, v))
-            count += 1
-    except TypeError:
-        return [(0, iterable)]
-    else:
-        return result
+    return [(0, iterable)] if not hasattr(iterable, "__iter__") else enumerate(iterable)
 
 
 def get_figures(source):
@@ -75,6 +66,11 @@ def save_figures(figures, cell_size):
         # Если фигура - текст:
         if figure.figure == "text":
             valid_attributes["text"] = figure.kwargs["text"]
+            valid_attributes["font"] = figure.kwargs["font"]
+            valid_attributes["size"] = figure.kwargs["size"]
+            valid_attributes["bold"] = figure.kwargs["bold"]
+            valid_attributes["italic"] = figure.kwargs["italic"]
+            valid_attributes["underline"] = figure.kwargs["underline"]
         # Создаем подэлемент, указываем имя, тип фигуры, цвет линии и цвет заливки
         sub = SubElement(drawing, 'figure', attrib=valid_attributes)
         for n, coord in new_enumerate(figure.args[0]):
