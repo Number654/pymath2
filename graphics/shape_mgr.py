@@ -208,9 +208,9 @@ class SuperShapeView:
             return
 
         cell_size = self.get_cell_size()
-        self.canvas.canvas_objects[self.index].args = (float(x1) * cell_size,
+        self.canvas.canvas_objects[self.index].args = ((float(x1) * cell_size,
                                                        (self.canvas.height // cell_size - float(y1)) * cell_size,
-                                                       )
+                                                        ),)
 
 
 class ShapeView(SuperShapeView):
@@ -253,10 +253,10 @@ class ShapeView(SuperShapeView):
             return
         cell_size = self.get_cell_size()
         self.canvas.canvas_objects[self.index].args = ((float(x1) * cell_size,
-                                                        (self.canvas.height // cell_size - float(y1) * cell_size),
+                                                        (self.canvas.height // cell_size - float(y1)) * cell_size,
                                                         float(x2) * cell_size,
-                                                        (self.canvas.height // cell_size - float(y2) * cell_size),
-                                                        ))
+                                                        (self.canvas.height // cell_size - float(y2)) * cell_size,
+                                                        ),)
 
 
 class LineView(ShapeView):
@@ -370,7 +370,7 @@ class TextView(SuperShapeView):
             return
 
         super().apply()
-        self.canvas.canvas_objects[self.index].args = (self.canvas.canvas_objects[self.index].args,)
+        self.canvas.canvas_objects[self.index].args = self.canvas.canvas_objects[self.index].args
         self.canvas.canvas_objects[self.index].kwargs = {"fill": self.color_btn.get_color(),
                                                          "text": self.text_var.get(),
                                                          "font": "Verdana",

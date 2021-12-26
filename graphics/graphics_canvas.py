@@ -36,6 +36,7 @@ class GeometryCanvas:
         self.canvas_objects = []
         self.showed_now = None  # Какую фигуру сейчас показывать? (переменная нужна для режима показа при выделении)
         self.now_figures = 0  # Сколько сейчас фигур нарисовано?
+        self.shift = False  # Если клавиша "Shift" будет зажата, то будет возможность рисовать толлько правильные фигуры
 
         self.canvas = Canvas(master, width=self.width, height=self.height, bg="#ffffff",
                              cursor="tcross")
@@ -45,6 +46,9 @@ class GeometryCanvas:
         self.x = x
         self.y = y
         self.canvas.place(x=self.x, y=self.y)
+
+    def set_attr(self, variable, value):
+        exec("self.%s = %s" % (variable, value))
 
     # Обновить холст
     def update(self):
@@ -92,8 +96,8 @@ class GeometryCanvas:
             return
 
         mouse_pos = self.abs_mouse_pos()
-        if figure != -1 and not ((mouse_pos[0] <= self.x or mouse_pos[0] >= self.x+self.width) or
-                                 (mouse_pos[1] <= self.y or mouse_pos[1] >= self.y+self.height)):
+        if figure != -1 and not ((mouse_pos[0] < self.x or mouse_pos[0] > self.x+self.width) or
+                                 (mouse_pos[1] < self.y or mouse_pos[1] > self.y+self.height)):
             self.begin_x = event.x
             self.begin_y = event.y
 
@@ -106,8 +110,8 @@ class GeometryCanvas:
         cell_size = self.cell_size_wid.get()
         mouse_pos = self.abs_mouse_pos()
 
-        if figure != -1 and not ((mouse_pos[0] <= self.x or mouse_pos[0] >= self.x+self.width) or
-                                 (mouse_pos[1] <= self.y or mouse_pos[1] >= self.y+self.height)) and \
+        if figure != -1 and not ((mouse_pos[0] < self.x or mouse_pos[0] > self.x+self.width) or
+                                 (mouse_pos[1] < self.y or mouse_pos[1] > self.y+self.height)) and \
                 (self.begin_x is not None and self.begin_y is not None):
 
             # Если режим рисования с точностью до пикселей включен, то
@@ -124,6 +128,11 @@ class GeometryCanvas:
                 begin_y_posted = post_cell(self.begin_y, cellsize=cell_size)
                 x_posted = post_cell(event.x, cellsize=cell_size)
                 y_posted = post_cell(event.y, cellsize=cell_size)
+
+            if self.shift and figure != 0:
+                width = x_posted - begin_x_posted
+                y_posted = begin_y_posted + width
+
             c_obj = CanvasObject(figure_codes[figure], (begin_x_posted, begin_y_posted, x_posted, y_posted),
                                  outline=self.color_wid.get_line_color(),
                                  fill=self.color_wid.get_fill_color(), width=1, name=figure_name)

@@ -14,7 +14,6 @@ from graphics.shape_selector import ShapeSelector
 tk = Tk()
 tk.title('GraphX')
 tk.geometry("910x460")
-tk.resizable(0, 0)
 
 # Переменная для установки режима рисования с точностью до пикселей
 pixel_mode = IntVar()
@@ -81,6 +80,8 @@ coordinates_text.place(x=19, y=420)
 
 tk.bind_all("<ButtonPress-1>", lambda event: canvas.start_drawing_by_mouse(event, shape_selector.get()))
 tk.bind_all("<ButtonRelease-1>", lambda event: canvas.stop_drawing_by_mouse(event, shape_selector.get()))
+tk.bind_all("<KeyPress-Shift_L>", lambda event: canvas.set_attr("shift", True))
+tk.bind_all("<KeyRelease-Shift_L>", lambda event: canvas.set_attr("shift", False))
 
 tk.protocol("WM_DELETE_WINDOW", canvas.quit)
 
@@ -141,6 +142,10 @@ while canvas.is_running:
             begin_y_posted = post_cell(canvas.begin_y, cellsize=cell_size)
             x_posted = post_cell(mouse_pos[0], cellsize=cell_size)
             y_posted = post_cell(mouse_pos[1], cellsize=cell_size)
+
+        if canvas.shift and drawing_now != 0:
+            width = x_posted - begin_x_posted
+            y_posted = begin_y_posted+width
 
         if drawing_now == 0:
             canvas.draw_line(begin_x_posted, begin_y_posted, x_posted, y_posted,
