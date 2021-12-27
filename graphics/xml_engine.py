@@ -17,6 +17,19 @@ def new_enumerate(iterable):
     return [(0, iterable)] if not hasattr(iterable, "__iter__") else enumerate(iterable)
 
 
+def draw_text(draw, coords, text, fill=(0, 0, 0, 0), size=10, bold=False, italic=False, underline=False):
+    name = "verdana%s.ttf" % ("b" if bold and not italic else ("i" if italic and not bold else
+                                                               (
+                                                                 "z" if bold and italic else "")))  # Имя файла шрифта
+    font_obj = ImageFont.truetype(font=name, size=size)
+    if underline:
+        w, h = draw.textsize(text, font=font_obj)
+        lx, ly = coords[0], coords[1] + h
+        draw.line((lx, ly, lx+w, ly), fill=fill, width=2)
+
+    draw.text(coords, text=text, font=font_obj, fill=fill)
+
+
 def get_figures(source):
     # Открываем .gd файл (Geometry Drawing)
     f = ElementTree(file=source)
@@ -59,18 +72,18 @@ def save_figures(figures, cell_size):
     # Проходимся по всем фигурам для сохранения
     for figure in figures:
         # Формируем словарь "правильных" аттрибутов
-        valid_attributes = {'type': figure.figure, 'name': figure.kwargs['tag'],
-                            'fill': figure.kwargs['fill']}
+        valid_attributes = {'type': figure.figure, 'name': figure.kwargs['name'],
+                            'fill': figure.kwargs['fill'], "width": str(figure.kwargs["width"])}
         if 'outline' in figure.kwargs.keys():
             valid_attributes['outline'] = figure.kwargs['outline']
         # Если фигура - текст:
         if figure.figure == "text":
             valid_attributes["text"] = figure.kwargs["text"]
             valid_attributes["font"] = figure.kwargs["font"]
-            valid_attributes["size"] = figure.kwargs["size"]
-            valid_attributes["bold"] = figure.kwargs["bold"]
-            valid_attributes["italic"] = figure.kwargs["italic"]
-            valid_attributes["underline"] = figure.kwargs["underline"]
+            valid_attributes["size"] = str(figure.kwargs["size"])
+            valid_attributes["bold"] = str(figure.kwargs["bold"])
+            valid_attributes["italic"] = str(figure.kwargs["italic"])
+            valid_attributes["underline"] = str(figure.kwargs["underline"])
         # Создаем подэлемент, указываем имя, тип фигуры, цвет линии и цвет заливки
         sub = SubElement(drawing, 'figure', attrib=valid_attributes)
         for n, coord in new_enumerate(figure.args[0]):
@@ -87,7 +100,6 @@ def figures2png(figures, path):
     # Создаем PNG-файл
     image = Image.new("RGBA", (586, 394), (0, 0, 0, 0))
     draw = ImageDraw.Draw(image)
-    image_font = ImageFont.truetype("verdana.ttf", size=10)  # Шрифт для текстов
 
     # Проходимя по фигурам
     for figure in figures:
@@ -110,8 +122,9 @@ def figures2png(figures, path):
         if figure.figure == "circle":
             draw.ellipse(xy=figure.args[0], fill=fill, outline=outline, width=round(figure.kwargs["width"]))
         if figure.figure == "text":
-            draw.multiline_text(xy=figure.args[0], text=figure.kwargs["text"], fill=fill,
-                                font=image_font)
+            draw_text(draw, figure.args[0], figure.kwargs["text"], fill=fill, size=figure.kwargs["size"],
+                      bold=figure.kwargs["bold"], italic=figure.kwargs["italic"],
+                      underline=figure.kwargs["underline"])
     # Сохраняем изображение
     del draw
     image.save(path, "PNG")

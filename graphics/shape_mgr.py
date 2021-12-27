@@ -372,6 +372,7 @@ class TextView(SuperShapeView):
         super().apply()
         self.canvas.canvas_objects[self.index].args = self.canvas.canvas_objects[self.index].args
         self.canvas.canvas_objects[self.index].kwargs = {"fill": self.color_btn.get_color(),
+                                                         "outline": None,
                                                          "text": self.text_var.get(),
                                                          "font": "Verdana",
                                                          "size": int(size),

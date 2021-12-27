@@ -199,13 +199,13 @@ class GeometryCanvas:
                     figures.append(CanvasObject(canvas_object.figure, canvas_object.args[0],
                                                 fill='', outline=canvas_object.kwargs['outline'],
                                                 width=canvas_object.kwargs["width"],
-                                                tag=canvas_object.kwargs['name']))
+                                                name=canvas_object.kwargs['name']))
                 else:
                     figures.append(CanvasObject(canvas_object.figure, canvas_object.args[0],
                                                 fill=canvas_object.kwargs['fill'],
                                                 outline=canvas_object.kwargs['outline'],
                                                 width=canvas_object.kwargs["width"],
-                                                tag=canvas_object.kwargs['name']))
+                                                name=canvas_object.kwargs['name']))
             return figures
 
         filename = asksaveasfilename(title='Экспорт',

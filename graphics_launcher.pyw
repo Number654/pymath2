@@ -9,6 +9,8 @@ from graphics.text import *
 from graphics.shape_mgr import *
 from graphics.shape_selector import ShapeSelector
 
+WAIT_TIME = 0.0044
+
 
 # Окно
 tk = Tk()
@@ -162,6 +164,6 @@ while canvas.is_running:
                                outline=canvas.color_wid.get_line_color(), width=1)
         del mouse_pos
 
-    sleep(0.0044)
+    sleep(WAIT_TIME)
     tk.update_idletasks()
     tk.update()

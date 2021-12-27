@@ -46,7 +46,7 @@ class ColorButton:
         return color
 
     def set_color(self, value=None):
-        if value is None:
+        if value is None or value == "":
             if not self.transparency:
                 return
             self.button.config(text=TRANSPARENT, fg="black", activeforeground="black")

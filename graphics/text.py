@@ -36,7 +36,7 @@ class TextSpawner:
 
             # Заносим этот текст в список объектов холста
             c_obj = CanvasObject("text", form_coords, fill=self.canvas.color_wid.get_line_color(),
-                                 text=text, font="Verdana", bold=False, italic=False,
+                                 outline=None, text=text, font="Verdana", bold=False, italic=False,
                                  underline=False, size=10, name=figure_name)
             self.canvas.canvas_objects.append(c_obj)
             self.canvas.shape_manager.add(c_obj)
