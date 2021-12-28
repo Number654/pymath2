@@ -37,6 +37,7 @@ class GeometryCanvas:
         self.showed_now = None  # Какую фигуру сейчас показывать? (переменная нужна для режима показа при выделении)
         self.now_figures = 0  # Сколько сейчас фигур нарисовано?
         self.shift = False  # Если клавиша "Shift" будет зажата, то будет возможность рисовать толлько правильные фигуры
+        self.grid = True  # Нужно ли отрисовывать сетку?
 
         self.canvas = Canvas(master, width=self.width, height=self.height, bg="#ffffff",
                              cursor="tcross")
@@ -49,6 +50,14 @@ class GeometryCanvas:
 
     def set_attr(self, variable, value):
         exec("self.%s = %s" % (variable, value))
+
+    # Включить или выключить отрисовку сетки
+    def toggle_grid(self):
+        self.grid = not self.grid
+        if self.grid:
+            self.cell_size_wid.change_btn.config(state="normal")
+        else:
+            self.cell_size_wid.change_btn.config(state="disabled")
 
     # Обновить холст
     def update(self):

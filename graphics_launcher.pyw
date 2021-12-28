@@ -9,7 +9,7 @@ from graphics.text import *
 from graphics.shape_mgr import *
 from graphics.shape_selector import ShapeSelector
 
-WAIT_TIME = 0.0044
+WAIT_TIME = 0.004
 
 
 # Окно
@@ -41,6 +41,11 @@ csw.set_canvas(canvas)
 
 cwg.place(x=625, y=21)
 csw.place(x=625, y=121)
+
+grid_var = IntVar()
+grid_var.set(1)
+grid_checkbutton = Checkbutton(tk, text="Сетка", variable=grid_var, command=canvas.toggle_grid)
+grid_checkbutton.place(x=380, y=420)
 
 # Кнопки экспорта, импорта, сохраниния изменений рисунка
 export_image_button = Button(tk, text='Экспорт...', width=12, command=canvas.save)
@@ -89,7 +94,7 @@ tk.protocol("WM_DELETE_WINDOW", canvas.quit)
 
 while canvas.is_running:
     canvas.update()
-    canvas.draw_net()
+    canvas.draw_net() if grid_var.get() else None
 
     # Выводим на экран текущую позицию курсора мыши в пикселях и клетках
     pointer = canvas.abs_mouse_pos()
