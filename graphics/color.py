@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from tkinter import Tk, Frame, Label, GROOVE, FLAT
+from tkinter import Tk, Frame, Label, GROOVE
 from .color_button import ColorButton
 
 

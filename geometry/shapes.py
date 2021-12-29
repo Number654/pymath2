@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from math import pi, sin, cos, sqrt
 
-from core.pymath import average
+from ..core.pymath import average
 
 
 class Shape(ABC):
