@@ -238,10 +238,9 @@ def geometric_mean(nums):
     return root(d, n=length)
 
 
-# Центральное число (центральное число 3 - это 2)
-# Четные числа не имеют центрального числа
-def central_number(num):
-    if not is_odd(num):
-        raise Exception('Even numbers has not got a "central number"')
-    div = num / 2 + 1
-    return div
+# Медиана
+def median(array):
+    array = sorted(array)
+    if not is_odd(len(array)):
+        return average([array[int(len(array)/2)-1]] + [array[int(len(array)/2)]])
+    return array[int(len(array)/2)]
