@@ -472,7 +472,7 @@ class Fraction:
         else:
             return Fraction('%s/%s' % (self.denominator, self.numerator))
 
-    # Привидение обыкновенной дроби к десятичному знаменателю
+    # Приведение обыкновенной дроби к десятичному знаменателю
     def to_decimal(self):
         if not self.is_translatable_to_decimal():
             raise ValueError("Cannot translate this fraction to decimal")

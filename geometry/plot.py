@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from tkinter import Frame, Canvas, Label
+from math import *
+from ..core import arcctg
 
 
 # График

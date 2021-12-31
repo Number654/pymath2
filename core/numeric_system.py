@@ -609,7 +609,7 @@ class Angle:
     ARC_SECONDS_TO_THOUSANDTHS = 'x*(1000*%s)/(180*3600)' % pi
 
 
-class Weight:
+class Mass:
 
     NANOGRAMS_TO_MICROGRAMS = 'x*0.001'
     NANOGRAMS_TO_MILLIGRAMS = 'x*1e-6'

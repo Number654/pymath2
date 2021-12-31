@@ -9,7 +9,10 @@ from .core.equations import (SuperSymbol, FractionalSymbol, LinearSymbol, Symbol
                              TwoSidedDoubleSymbol, EqSystem, TransferEqSystem)
 from .core.scale import Scale
 from .core.roman import (arab2roman, roman2arab)
-from .core import numeric_system
+
+from .core.numeric_system import (Length, Area, Volume, Time, Mass, Voltage, Resistance, InformationSize,
+                                  Capacity, Power, convert, convert_speed)
+from .core.numeric_system import Angle as AngleSize
 
 from .geometry.impossible_square import ImpossibleSquare
 from .geometry.pie_chart import PieChart
@@ -19,6 +22,8 @@ from .geometry.shapes import (Shape, Angle, Line, Segment, Ray, Ellipse, Circle,
 from .cipher.cipher import (CaesarCipher, VigenereCipher, AtbashCipher, EnigmaCipher)
 from .cipher.alphabet import Alphabet
 
+from .graphics.xml_engine import GeometryDrawingError
+
 
 __all__ = ["is_odd", "is_simple", "is_positive", "is_evil", "multiply_all", "multiples", "dividers",
            "lcm", "gcd", "prime_factorization", "visual_prime_factorization", "tens_factorization",
@@ -27,6 +32,8 @@ __all__ = ["is_odd", "is_simple", "is_positive", "is_evil", "multiply_all", "mul
            "sort_fractions", "solve_fraction_expr", "Fraction", "Double", "LiteralFraction", "PeriodicFraction",
            "SuperSymbol", "FractionalSymbol", "LinearSymbol", "Symbol", "SuperDoubleSymbol", "DoubleSymbol",
            "TwoSidedDoubleSymbol", "EqSystem", "TransferEqSystem", "Scale", "arab2roman", "roman2arab",
-           "numeric_system", "ImpossibleSquare", "PieChart", "Graph", "Plotter", "Shape", "Angle", "Line",
-           "Segment", "Ray", "Ellipse", "Circle", "RegularPolygon", "IrregularPolygon", "CaesarCipher",
-           "VigenereCipher", "AtbashCipher", "EnigmaCipher", "Alphabet"]
+           "ImpossibleSquare", "PieChart", "Graph", "Plotter", "Shape", "Angle", "Line", "Segment", "Ray",
+           "Ellipse", "Circle", "RegularPolygon", "IrregularPolygon", "CaesarCipher", "VigenereCipher",
+           "AtbashCipher", "EnigmaCipher", "Alphabet", "Length", "Area", "Volume", "Time", "Mass", "Voltage",
+           "Resistance", "InformationSize", "Capacity", "Power", "convert", "convert_speed", "AngleSize",
+           "GeometryDrawingError"]
