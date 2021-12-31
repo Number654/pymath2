@@ -1,0 +1,52 @@
+pymath2
+|
+|---cipher - A package for working with simple ciphers
+|   |
+|   |---__ init__.py
+|   |---alphabet.py - Class for creating the alphabet by which encryption will be performed
+|   |---cipher.py - Main package file containing classes with simple cipher algorithms
+|
+|---core - The main project package containing the main project functionality
+|   |
+|   |---__ init__.py
+|   |---equations.py - A module for solving linear and fractional equations and their systems
+|   |---fractions.py - Fraction calculator
+|   |---interesting.py - Test for the "turtle" built-in library
+|   |---numeric_system.py - A module for working with numeric systems
+|   |---pymath.py - The main project file. Contains common math functions such as GCD and LCM
+|   |---roman.py - A module for working with roman numbers
+|   |---scale.py - Module for scale calculations
+|
+|---doc - Project documentation folder
+|   |
+|   |---documentation-en.txt - Instructions for using Pymath in English
+|   |---documentation-ru.txt - Instructions for using Pymath in Russian
+|   |---file-id-en.txt - Description of the purpose of each of the project files in English
+|   |---file-id-ru.txt - Description of the purpose of each of the project files in Russian
+|   |---whatsnew-en.txt - What's New in Pymath 2.0? (English)
+|   |---whatsnew-en.txt - What's New in Pymath 2.0? (Russian)
+|
+|---geometry - Geometric computation package
+|   |
+|   |---impossible_square.py - Module for drawing impossible squares on the tkinter canvas
+|   |---shapes.py - Geometric computation module
+|   |---pie_chart.py - A module for plotting pie charts in a tkinter window
+|   |---plot.py - A module for plotting graphs in a tkinter window.
+|
+|---graphics - Utility package containing application components for drawing geometric shapes
+|   |
+|   |---__ init__.py
+|   |---canvas_object.py - A class for storing information about a geometric shape
+|   |---cellsize.py - Component that implements a cell resizing widget
+|   |---color.py - A component that allows you to draw shapes in color
+|   |---graphics_canvas.py - A component that implements algorithms for working with a drawing field
+|   |---mouse.py - Component for calculating coordinates for drawing shapes by tiles
+|   |---text.py - A component that allows you to insert text into the drawing field
+|   |---xml_engine.py - Component for saving and opening drawings (in PNG and XML format)
+|
+|---__ init__.py
+|---bignumber.7z - File containing the number 10^(10^10) compressed
+|---clock.pyw - Analog clock application
+|---graphics_launcher.pyw - An application for drawing geometric shapes
+|---plotter.pyw - Test plotter application
+|---text_editor.pyw - Text editor application

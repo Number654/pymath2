@@ -1,0 +1,32 @@
+What's new in this update?
+
+Fixed some bugs
+Added exponentiation with assignment
+Added automatic conversion of fractions into the required format when performing arithmetic operations
+Added the ability to evaluate expressions with fractions without creating instances of the Fraction class
+Added Double class for decimal fractions of unlimited precision
+Added the LiteralFraction class for fractions with an expression in the numerator and / or in the denominator
+Attention! Renamed "geometry" module to "graphics", now there is a separate "geometry" module
+for geometric calculations
+Added the ability to draw with color in the graphics mod
+Added the ability to resize cells in graphics
+Added module for drawing impossible squares
+Added ability to write text on canvas in graphics
+Added drawing mode with pixel precision in graphics
+Added the ability to undo and redo in graphics
+Added the ability to insert text onto the canvas in graphics
+Added a status bar showing the current location of the mouse cursor
+Added a translator from Roman numbers to Arabic numbers and vice versa
+Added a module for converting from one number system to another
+Optimized module for encryption with Caesar cipher: removed .json files with tables for encryption,
+instead, encryption is now done by going alphabetically n letters back and forth
+Added Vigenère cipher
+Added Atbash cipher
+Added Enigma cipher
+Added the Alphabet class in the alphabet module to provide the ability to create your own alphabet
+Added a small text editor (requires IDLE installed!)
+Added pointer clock
+Added pie_chart module for building pie charts
+Added the ability to calculate a point on a circle using a known radius and angle in radians
+Added scale module for scale calculations
+Added equations module for solving linear and fractional equations and systems

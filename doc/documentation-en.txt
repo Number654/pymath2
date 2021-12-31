@@ -1,0 +1,936 @@
+The Pymath project is a small tool that extends Python's built-in math tools.
+
+Update 2.0 is out!
+
+    In this update:
+        1. Correction of bugs and errors
+        2. Improved and expanded functionality of the tool
+        3. Small built-in applications are built into the project,
+          such as an analog clock or a text editor
+        4. Added a new package for geometric calculations
+    Details of the news in Update 2.0 are listed in the "whatsnew-ru.txt" file.
+
+
+Instructions for use
+
+
+    Chapter I. Basic functionality
+        In the Pymath project, the main package is a package called "core".
+        It contains several files, which will be discussed in this chapter.
+
+        Let's start with the main file, "pymath.py", which contains the main
+        the functionality of the tool. It contains the following features:
+            1. To find out if a number is odd, use the "is_odd()" function.
+              It takes one argument: num is the number you want to check.
+            2. To find out if a number is prime, use the "is_simple()" function.
+              It takes one argument: num is the number you want to check.
+            3. To find out if a number is positive, use the "is_positive()" function.
+              It takes one argument: num is the number you want to check.
+            4. To find out if the number is evil (https://en.wikipedia.org/wiki/Evil_number),
+              use the "is_evil ()" function. It takes one argument: num is a number,
+              which you want to check.
+            5. To multiply the numbers from the iterable, use the "multiply_all()" function.
+              It takes one argument: _all is an iterable containing the numbers you want
+              multiply.
+            6. To find multiples of a number, use the "multiplies()" function.It takes one required argument: num - the multiple of which you want to find
+              and one optional: length - the number of multiples you need, by default equal to 10.
+            7. To find the divisors of a number, use the "dividers()" function.
+              It takes one argument: num is the number you want to find the divisors for.
+            8. To find the least common multiple (LCM) of multiple numbers, use
+              function "lcm ()". It accepts any number of arguments, which will be
+              the numbers you want to find the LCM.
+            9. To find the greatest common divisor (GCD) of multiple numbers, use
+              function "gcd ()". It accepts any number of arguments, which will be
+              the numbers you want to find the GCD of.
+            10. To factor a number into prime factors, use the "prime_factorization()" function.
+              It takes one argument: num is the number you want to factor into.
+              The function will return two values: the first is a dictionary that contains the result of the decomposition
+              line by line; the second is an object of type "collections.Counter" containing the number of identical
+              prime factors. I advise you to use the "visual_prime_factorization()" function
+              (see point 11), since it returns as a result a string containing
+              more visual decomposition result.
+            eleven.To get a visual result of the factorization of a number into prime factors, use
+              function "visual_prime_factorization()". It takes the result as an argument.
+              function "prime_factorization()" (see paragraph 10), converting it into a string that is easy to understand.
+            12. To represent a number as a sum of bit terms, use the function
+              tens_factorization(). It takes one argument: num is the number you want
+              process.
+            13. To generate a table of degrees in a range of natural numbers, use
+              function "degree_table()". It takes two arguments: degree is an exponent
+              the degree to which each of the numbers in the table should be raised; _range - range of integers
+              numbers to use in the table.
+            14. To find the arithmetic mean of several numbers, use the "average()" function.
+              It takes one argument: nums - an iterable containing numbers, mean
+              the arithmetic you want to find.
+            15. To find the nth root of a number, use the "root()" function. It
+              takes one required argument: x - the number you want to root for
+              and one optional: n - root exponent, by default equal to 2.
+            16. To find the inverse cotangent of a number, use the "arcctg()" function. It takes
+              one argument: x - the number whose inverse tangent you want to find.
+            17. To perform division with remainder, use the "better_divmod()" function.
+              It takes two arguments: x is the dividend; y is the divisor. This function was created by
+              to replace the built-in function "divmod()" since the latter rounds the result
+              division to get an integer instead of truncating the fractional part of the result.
+            18. To find the geometric mean of several numbers, use the "geometric_mean()" function.
+              It takes one argument: nums - an iterable containing numbers, mean
+              the geometric you want to find.
+            19. To find the median of multiple numbers, use the "median()" function. It takes one argument:
+              array is an iterable containing the numbers for which you want to find the median.
+
+        The "fractions.py" file contains tools for working with fractions. In this
+        file contains classes as well as some functions. Let's start with the classes:
+            1. The "Fraction" class. This class is needed to store an ordinary fraction in a variable.
+              The class is instantiated as follows:
+                  my_fraction = Fraction("5&2/3")
+                First comes the integer part (if any), then the "&" sign is put, then the numerator comes
+              fraction, after it there is a sign "/", at the end comes the denominator of the fraction.
+                All arithmetic operations can be performed with an instance of the class, as well as
+              exponentiation with an integer exponent. In addition, the "Fraction" class has
+              the following methods:
+                  1. "Fraction.is_mixed_number()". This method will return True if the fraction is
+                    a mixed number (has an integer part).
+                  2. "Fraction.is_improper()". This method will return True if the fraction is
+                    improper.
+                  3. "Fraction.is_typical()". This method will return True if the fraction is not
+                    a mixed number and not an improper fraction.
+                  4. "Fraction.is_contract()". This method will return True if the fraction can be canceled.
+                  5. "Fraction.format_to_improper_fraction()". This method is needed to transform
+                    mixed number into improper fraction. If the fraction is not a mixed number
+                    or is already invalid, the method will return a copy of the fraction you tried
+                    convert.
+                  6. "Fraction.format_to_mixed_number()". This method is needed to transform
+                    an improper fraction to a mixed number. In case the fraction is already a mixed number
+                    or is not incorrect, the method will return a copy of the fraction you tried
+                    convert.
+                  7. "Fraction.reduce()". When this method is called, the fraction will be reduced.
+                    to irreducible.
+                  8. "Fraction.reverse()". The method will return the inverse of the given fraction.
+                  9. "Fraction.to_decimal()". This method is needed to bring an ordinary fraction
+                    to the decimal denominator. Moreover, if the fraction cannot be converted to decimal,
+                    the method will throw a ValueError exception.
+                  10. "Fraction.is_translatable_to_decimal()". This method will return True if the fraction
+                    can be converted to decimal.
+                  11. "Fraction.format_sign()". This method is a service one. It is called in the constructor
+                    the "Fraction" class to simplify the signs in the numerator and denominator of the fraction. For instance,
+                    if both the numerator and the denominator of the fraction are negative numbers, then after simplification
+                    the fraction will be positive.
+                This class also supports conversion to int type. To do this, you need to call
+              the built-in function int() and pass it an instance of the "Fraction" class. When calling this
+              the function will cut off the fractional part.
+
+            2. The "LiteralFraction" class. This class is needed to store in a variable
+              an ordinary fraction, the numerator and / or denominator of which are alphabetic
+              expressions.
+              The class is instantiated as follows:
+                  my_fraction = LiteralFraction(("2a+5.5b", "6c-8a"))
+                  A list or tuple is passed to the class constructor, in which the first object is
+                a string containing the numerator of the fraction; the second is a string containing the denominator of the fraction.
+                  Attention! This class does not support mixed numbers.
+              This class does not support arithmetic operations. Class numerator retained
+              in the instance variable "my_fraction.numerator", the denominator in "my_fraction.denominator".
+              By changing these variables, you change the expressions in the fraction. In addition, the class has
+              methods for concatenating expressions:
+                  1. "LiteralFraction.append_to_numerator()". This method performs concatenation
+                    expressions in the numerator of a fraction and takes one argument: string - literal
+                    the expression you want to attach to the numerator expression.
+                  2. "LiteralFraction.append_to_denominator()". This method performs concatenation
+                    expressions in the denominator of a fraction and takes one argument: string - literal
+                    the expression you want to attach to the denominator expression.
+
+            3. Class "Double". This class allows you to use floating point numbers
+              greater accuracy. The limiters of accuracy are the amount of RAM and
+              processor power.
+              The class is instantiated as follows:
+                  my_fraction = Double("3.14159265358979323846")
+                  One argument is passed to the constructor: a string containing a decimal fraction.
+                Please note that the integer part of the number from the fractional part is separated only by a dot.
+              This class supports all arithmetic operations, as well as the class
+              "Fraction". Some other methods of the Double class are listed below:
+                  1. "Double.round()". This method rounds the decimal to
+                    desired accuracy and takes one optional argument: accuracy - accuracy,
+                    to which should be rounded, by default - to integers. The rounding goes like this
+                    the same as in the case with the built-in round() method, which you can read about in
+                    Python documentation.
+                This class also supports conversion to int type. To do this, you need to call
+              the built-in function int() and pass it an instance of the "Double" class. When calling this
+              the function will cut off the fractional part.
+                It is also possible to convert the "Double" type to the float type. To do this, you need to call
+              the built-in function float() and pass it an instance of the "Double" class. Attention! At
+              conversion to float type may lose precision.
+
+            4. Class "PeriodicFraction". This class allows you to work with periodic fractions.
+               The class is instantiated as follows:
+                   my_fraction = PeriodicFraction("1.(3)")
+                   One argument is passed to the constructor: a string containing a periodic fraction.
+                 In this case, there is a whole part in front of the point, then a point, after it there are numbers up to the period
+                 (if any), then, in brackets are the numbers in the period.
+                   Please note that only a dot separates the whole part from the fractional part.
+               This class does not support arithmetic operations, however, it is possible to translate
+               a periodic fraction into an ordinary one, and with it to perform arithmetic operations. Below
+               the methods of the "PeriodicFraction" class are listed:
+                   1. "PeriodicFraction.to_ordinary()". This method takes no arguments. Needed
+                     to convert a periodic fraction to a common fraction. Returns an instance when called
+                     of the "Fraction" class containing the translation result.
+                   2. "PeriodicFraction.is_clean()". This method will return True if the periodic
+                     the fraction is pure, that is, it does not contain digits in front of the period.
+
+            Also the file "fractions.py" contains several functions for working with fractions:
+              1. To find out if a string contains a floating point number, use the "isfloat ()" function.
+               It takes one argument: string - the string you want to check. The function will return True,
+               if the string contains a floating point number.
+             2. To convert an integer (int) to an ordinary improper fraction, use the function
+               "int2fraction()". It takes one argument: integer - the integer you want
+               convert.
+             3. To convert a floating point number (float) to a fraction, use the function
+               "float2ordinary()". It takes one argument: _float is a floating point number that
+               You want to convert.
+             4. To convert a list of strings containing fractions into a list of fractions of the "Fraction" type,
+               use the "strings_list2fractions_list()" function. It takes one argument: my_list -
+               an iterable, including the list you want to convert. Note,
+               that the lines in the list to be converted must have the same structure as those that you
+               you pass it to the constructor of the "Fraction" class (see page ***).
+             5. To convert an integer (int) or floating point number (float) to ordinary
+               fraction, use the "to_fraction()" function. This function essentially combines algorithms from functions
+               int2fraction() and float2ordinary().It takes one argument: __obj is a number that
+               You want to convert. If the "Fraction" type is passed as an argument, that is, not
+               an ordinary fraction requiring transformation, the function will return it. If the argument won't
+               be neither int, float, nor "Fraction", the function will return None.
+             6. To reduce fractions to the lowest common denominator, use the function
+               reduce_to_common_denominator (). It accepts one argument: my_fractions is an iterable
+               an object containing fractions ("Fraction"). This function will return a list of fractions with
+               lowest common denominator.
+             7. To sort the list of fractions, use the "sort_fractions ()" function.
+               It takes one required argument: my_fractions is an iterable containing
+               ordinary fractions ("Fraction"); and one optional: reverse - an argument denoting
+               sort order: True - descending, False - ascending; the default is False.
+               This function will return a list of common fractions sorted in a given order.
+             8. To solve a short expression with enclosed fractions in a string, use the function
+               "solve_fraction_expr ()". It takes one argument: expr is the string containing the expression.Please note that all fractions must be separated from arithmetic signs.
+               actions with spaces and have the same structure as the strings passed to the class constructor
+               "Fraction" (see page ***). Important! This function does not support nested expressions.
+               brackets.
+
+            The "equations.py" file contains tools for working with equations. This file contains the classes
+            to solve the equations and systems of equations listed below:
+            1. The "SuperSymbol" class. This class is needed to store an unknown letter in a variable,
+              then perform arithmetic operations with it, and then solve. This happens as follows
+              way:
+                  a = SuperSymbol(symbol="a")
+                  a = 8-(2*a*5+3)
+              The constructor of this class takes one optional argument: symbol - a letter,
+              which you want to use in the equation (the default is "x").
+
+              This class, in addition to methods for performing arithmetic operations, has other methods,
+              listed below:
+                  1. "SuperSymbol.can_solve()". This one takes one argument: z is the right side of the equation
+                    (it can be a number or another instance of the SuperSymbol class) and will return True if
+                     the equation has at least one solution.
+                  2. "SuperSymbol.get()". This method takes one argument: z is the right side of the equation.
+                    Moreover, if you pass another instance of the SuperSymbol class as an argument,
+                    the terms will be transferred, and then the equation will be solved. If the equation does not have
+                    solutions, the method will return None.
+                  3. "SuperSymbol.post_symbol()". This method takes one argument: n is a number that
+                    must be substituted for the unknown in the equation.This method is needed to solve
+                    numerical expression, which will be obtained by substituting the number "n" on the left side of the equation
+                    instead of the unknown.
+
+              Attention! The SuperSymbol class is the superclass of all equation solving classes.
+              This means that all subclasses will be arranged in a similar way to this class.
+              Since the subclasses of this class are linear and fractional equations, in the superclass does not find algorithms for their solution.
+              For example, in the "SuperSymbol.get()"
+              only the addend transfer algorithm is implemented. After executing this algorithm, the method
+              will transfer control to the metld from the subclass, which, in turn, will make the decision
+              equations. If the transfer of the addends was not required, the method will return the line "continue",
+              having received which, the method for solving the equation from the subclass will perform this action.
+              Also in the superclass method "SuperSymbol.post_symbol()" there is no ralization, the method
+              redefined in subclasses and implemented.
+
+              2. The "LinearSymbol" class. This class is a subclass of "SuperSymbol" (see clause 1). He
+              needed to solve linear equations. The instantiation of the class happens
+              the same as for "SuperSymbol":
+                  a = SuperSymbol(symbol="a")
+                  a = 8-(2*a*5+3)
+
+              As mentioned in point 1, "LinearSymbol" and other subclasses have the same methods as
+              "SuperSymbol". This means that this class must be used in the same way as the class.
+              "SuperSymbol".
+
+            3. The "FractionalSymbol" class. This class is a subclass of "SuperSymbol" (see clause 1).
+              It is needed to solve fractional equations (in which the unknown is in the denominator). Creation
+              an instance of a class proceeds in the same way as for "SuperSymbol":
+                  a = SuperSymbol (symbol="a")
+                  a = 8-(2*a*5+3)
+
+              As mentioned in point 1, "LinearSymbol" and other subclasses have the same methods as
+              "SuperSymbol". This means that this class must be used in the same way as the class.
+              "SuperSymbol".
+
+            4. Class "Symbol". This class is a subclass of "SuperSymbol" (see clause 1). He is needed
+              for solving equations of an indefinite form (the form can change from linear to fractional
+              and back in the process of arithmetic operations). The creation of an instance of the class occurs
+              same as y "SuperSymbol":
+                  a = SuperSymbol(symbol="a")
+                  a = 8-(2*a*5+3)
+
+              As mentioned in point 1, "LinearSymbol" and other subclasses have the same methods as
+              "SuperSymbol". This means that this class must be used in the same way as the class.
+              "SuperSymbol".
+
+            5. The "SuperDoubleSymbol" class. This class is needed to work with equations in which unknown
+              two numbers and are used in systems of equations. This class is a subclass of Symbol.
+              Note that the "Symbol" class is chosen as the superclass for "SuperDoubleSymbol", since
+              definition of the form of the equation is not required.
+              The creation of an instance of the class is as follows:
+                  eq = SuperDoubleSymbol(sub=True, symbol1="p", symbol2="q")
+                  eq = 9-(2*eq+6-8*(eq-1))
+
+              The constructor of the "SuperDoubleSymbol" class takes three optional arguments: sub - True,
+              if you need to subtract two unknowns (the second from the first), by default False; symbol1 -
+              the letter you want to denote the first unknown, by default "x"; symbol2 - letter,
+              which you want to denote the second unknown, the default is "y".The SuperDoubleSymbol class supports arithmetic, however if you try
+              call the "SuperDoubleSymbol.get()" method, it will throw a TypeError because the equations
+              two unknowns cannot be solved separately - they are used only in the system
+              equations.
+
+              Attention! The "SuperDoubleSymbol" class is the superclass of all classes for working with
+              equations in two unknowns. This means that all of its subclasses will be arranged
+              in a manner similar to this class.
+
+            6. Class "DoubleSymbol". This class is a subclass of "SuperDoubleSymbol" (see clause 5).
+              It is needed to work with equations in which two numbers are unknown. As stated in paragraph
+              above, such equations cannot be solved separately from the system of equations. Instantiation
+              class goes like this:
+                  eq = DoubleSymbol(5, sub=True, symbol1="p", symbol="q")
+                  eq = 9-(2*eq+6-8*(eq-1))
+
+              The class constructor accepts, in addition to the arguments of its superclass, a required argument
+              z is the right side of the equation (number).
+
+              This class has 1 method:
+                  "DoubleSymbol.express_x()". This method takes no arguments and is needed to express
+                  the first unknown from the equation. The method will return an instance of the "Symbol" class - an equation with
+                  one unknown, which will have the letter ator unknown.
+
+            7. Class "TwoSidedDoubleSymbol". This class is a subclass of "SuperDoubleSymbol"
+              (see point 5). It is needed to work with equations in which two numbers are unknown, but
+              with the possibility of transferring the terms (only if there are unknowns in the equation in both parts).
+              For such equations, a separate class of system of equations has been created, which will be written in
+              following paragraphs.The class is instantiated as follows:
+                  eq = TwoSidedDoubleSymbol(sub=True, symbol1="p", symbol2="q")
+                  eq = 9-(2*eq+6-8*(eq-1))
+
+              This class, unlike "DoubleSymbol", does not have an "express_x()" method. Since in
+              unknowns are found on both sides of such an equation, the transfer of terms is separate from
+              the system of equations cannot be implemented. This happens immediately when solving the system
+              equations. Also, in the "TwoSidedDoubleSymbol" class, you do not need to immediately pass the right
+              part, since in the constructor of the class for solving systems of equations with transfer of terms
+              tuples with two instances of the "TwoSidedDoubleSymbol" class are passed: one - the left side;
+              the second is the right one.
+
+            8. Class "EqSystem". This class is needed to solve systems of equations. Instantiation
+              class goes like this:
+                eq1 = DoubleSymbol(7, sub=False, symbol1="x", symbol2="y")
+                eq1.k2 = 5 # The coefficient of the second unknown is now 5
+
+                eq2 = DoubleSymbol(4, sub = True, symbol1="x", symbol2="y")
+                eq2.k, eq2.k2 = (3, 2) # Coefficients of the 1st and 2nd unknowns are 3 and 2, respectively
+
+                eq_system = EqSystem(eq1, eq2)
+
+              First you need to create two instances of the "DoubleSymbol" class, then pass them to
+              constructor of the "EqSystem" class. Important! To set the desired coefficients to unknowns,
+              refer to the instance variables: k is the coefficient of the first unknown; k2 -
+              coefficient of the second unknown (by default, all coefficients are equal to 1).
+
+              This class has 1 method:
+                  "EqSystem.get()". This method takes no arguments and is needed to solve the system
+                  equations. Returns a dictionary in which the key is the letter of the unknown, the value is
+                  the meaning of the unknown.
+
+            9. Class "TransferEqSystem". This class is a subclass of the "EqSystem" class and needs
+              for solving systems of equations with preliminary transfer of terms in these equations.The class is instantiated as follows:
+                eq1_left = 3 * TwoSidedDoubleSymbol(sub=True, symbol1="x", symbol2="y")
+                eq1_left = eq1_left + 5 * Symbol("x") # Left side of first equation
+                eq1_right = 2 * (3 * Symbol("x") - 2) # Right side of first equation
+
+                # Left side of second equation
+                eq2_left = 4*Symbol("x")-2*TwoSidedDoubleSymbol(sub=False, symbol1="x", symbol2="y")
+                eq2_right = 4-3*Symbol("y") # Right side of second equation
+
+                eq_system = TransferEqSystem((eq1_left, eq1_right), (eq2_left, eq2_right))
+
+              The constructor of the "TransferEqSystem" class is passed two tuples containing the left
+              and the right side of the equations.
+
+              This class has 1 method:
+                  "TransferEqSystem.get()". This method takes no arguments and is needed to solve
+                  systems of equations. When called, the terms in both equations will be transferred,
+                  the result will be equations with unknowns only on the left side (instances of the class
+                  "DoubleSymbol"), after that, based on the received data, an instance will be created
+                  class "EqSystem" and the solution of the system of equations. The method will return a dictionary,
+                  where the key is the letter of the unknown, the value is the value of the unknown.
+
+        The "roman.py" file is quite small - it contains two functions for translating Arabic numbers
+        in Roman and vice versa. Note that not all numbers can be converted to Roman. You can translate
+        only numbers from 1 to 3999 inclusive. These two functions are described below:
+            1. "arab2roman()". This function is needed to translate an Arabic number into a Roman number. She
+              takes one argument: num - the number (int) you want to translate. Function
+              returns the string str.
+            2. "roman2arab()". This function is needed to convert a Roman number to Arabic. She
+              takes one argument: num - a string with the Roman number (str) you want
+              to translate into Arabic. The function returns an integer int.
+
+        The "scale.py" file is also quite small - it contains one "Scale" class for working with scale.
+        An instance of the "Scale" class is created as follows:
+            my_scale = Scale("1:50") # 1 cm 50 cm.
+
+        The class constructor takes one argument: scale - a string containing the scale. Wherein,
+        first, the distance on the map (in cm) is written, then the colon ":", then the distance by
+        terrain (in cm).
+
+        The "Scale" class contains the following methods:
+            1. "Scale.to_fraction()". This method takes no arguments and is needed for translation
+              an instance of the "Scale" class to the "Fraction" type (see above). Moreover, as a result, the numerator
+              the fraction will be the distance on the map (in cm), and the denominator is the distance on the ground (in cm).
+            2. "Scale.to_string()". This method takes no arguments and is needed for translation
+              the numerical scale "Scale" to a named scale (string). note that
+              the string will contain units of measure in English.
+            3. "Scale.get_on_image()". This method is needed to get the distance on the map for a given
+              distance on the ground. For example, if the distance on the ground is 5 m, and the scale
+              is equal to 1: 100, then the distance at the edge will be 5 cm.This method takes one argument:
+              real_distance - distance on the terrain as a number. Important! Distance on the ground should
+              be specified in centimeters. The method will return the Fraction type, the result will be given in centimeters.
+            4. "Scale.get_real()". This method is needed to get the distance on the ground for a given
+              distance on the map. For example, if the distance on the map is 2 cm and the scale is 1: 100,
+              then the distance on the ground is 2 m.This method takes one argument:
+              distance_on_image - distance at the edge as a number. Important! The distance on the map should be
+              given in centimeters. The method will return the Fraction type, the result will be given in centimeters.
+
+        The file "numeric_system.py" contains classes with constants for converting from one number system to
+        another. It is possible to convert units of length, area, volume, time, units of measurement
+        angles, mass, electrical voltage, resistance, information volume, capacitance,
+        current strength, as well as power.
+
+        Constants for converting length units are in the "Length" class. Supported
+        length units are shown below.
+            1. Metric units of measurement of length from nanometer to kilometer inclusive
+            2. Yards, feet, inches, miles.
+
+        Constants for converting area units are in the "Area" class. Supported
+        area units are shown below.
+            1. Metric units of measurement of area from square nanometer to square kilometer
+              inclusive.
+            2. Macaws, hectares, square yards, square feet, square inches, square miles.
+
+        Constants for converting volume units are in the "Volume" class. Supported
+        volume units are shown below.
+            1. Microliters, milliliters, liters, cubic millimeters, cubic centimeters, cubic
+              meters, cubic kilometers.
+            2. Cubic yards, cubic feet, cubic inches, US barrels.
+
+        Constants for converting time units are in the "Time" class. Supported
+        time units are shown below.
+            one.Metric units of time from nanosecond to second inclusive.
+            2. Minutes, hours, days, weeks, months, years, decades, centuries.
+
+        Constants for converting angle units are in the "Angle" class. Supported
+        Angle units are shown below.
+            1. Grades, degrees, radians, thousandths, minutes of an arc, seconds of an arc.
+
+        Constants for converting mass units are in the "Mass" class. Supported
+        mass units are shown below.
+            1. Metric units of mass measurement from nanograms to kilotons inclusive.
+
+        Constants for converting electrical voltage units are in the "Voltage" class.
+        Supported units of electrical voltage are shown below.
+            1. Metric units of voltage measurement from picovolt to teravolt inclusive.
+
+        Constants for converting resistance units are in the "Resistance" class.
+        Supported resistance units are shown below.
+            1. Metric units of resistance measurement from micro-ohm to mega-ohm inclusive.
+
+        Constants for converting units of measurement of the amount of information are in the "InformationSize" class.
+        The supported units of measure for the amount of information are shown below.
+            1. Measurement units of information volume from bit to petabyte inclusive.
+
+        Constants for converting capacitor capacitance units are in the "Capacity" class.
+        The supported capacitor units are shown below.1. Metric units for measuring the capacitance of a capacitor from picofarad to gigafarad inclusive.
+
+        Constants for converting current units are in the "Amperage" class. Supported
+        current units are shown below.
+            1. Metric units of current strength from nanoamperes to kiloamperes inclusive.
+
+        Constants for converting power units are in the "Power" class. Supported
+        power units are shown below.
+            1. Metric units of power measurement from picowatts to petawatts inclusive.
+
+        In order to convert units, the "numeric_system.py" file contains the "convert()" function.
+        It takes two arguments: formula - constant for translation; x - the number specified in that unit
+        measurement that should be transferred to another. In this case, the access to the constant occurs as follows
+        in the following way: Class.CONSTANT, where Class is a class containing constants for converting units of measurement
+        the values indicated above; CONSTANT - constant for translation, respectively.
+
+        Also, the file contains the "convert_speed()" function. This function is needed to convert units
+        speed measurement. Formulas for converting speed units are not available in classes, since
+        they would take up too much space. The "convert_speed ()" function takes two arguments: speed1 -
+        a string containing the speed with the number to be translated; speed2 - a string containing the unit of measurement
+        the rate to which the number from the first line should be translated. Usage example:
+            y = convert_speed ("5 kilometers/hour", "meters/minute")
+
+        The first line is formatted like this: first comes a number (int or float, classes are allowed,
+        realizing numbers, for example, "Fraction"), then a space is followed by a distance unit,
+        and the one supported by the "Length" class (in English), then the "/" without spaces,
+        then the unit of measure for time, which is supported by the "Time" class (in English).
+        The second line is formatted like this: first comes the distance unit that the class supports
+        "Length" (in English) followed by "/" followed by the time unit it supports
+        class "Time" (in English).
+
+
+    Chapter II. Encryption with simple ciphers
+        The Pymath project also has a cipher package. This package contains tools for working
+        with simple ciphers. This chapter will talk about this package.
+
+        Let's start with the file "alphabet.py". It contains the "Alphabet" class, which is needed to create the alphabet
+        encryption. The class is instantiated as follows:
+            alphabet = Alphabet("abcdefghijklmnopqrstuvwxyz", 4)
+
+        The class constructor takes two arguments: symbols - a string containing the letters of the alphabet;
+        most_used - the index of the most common letter of the alphabet, starting at zero.
+
+        The file "cipher.py" contains the encryption algorithms in the form of classes. The file contains the classes:
+            1. "CaesarCipher". This class implements the Caesar cipher encryption algorithm. Creation
+              an instance of a class goes like this:
+                  alphabet = Alphabet("abcdefghijklmnopqrstuvwxyz", 4) # Create the Latin alphabet
+                  my_cipher = CaesarCipher ("Lorem ipsum dolor, sit amet.", alphabet)
+
+              The class constructor takes one required argument: data - a string containing
+              data that you want to decrypt or encrypt; and one optional -
+              _alphabet - the alphabet used in the string, which will be produced
+              encryption (default - Latin).
+
+              The CaesarCipher class contains the following methods:
+                  1. "CaesarCipher.to_string()".This method takes no arguments, will return a string
+                    with the data passed to the class constructor (see above).
+                  2. "CaesarCipher.encrypt()". This method takes one argument: key - the key
+                    (integer int), by which encryption will be performed. The method will return
+                    encrypted data as a string.
+                  3. "CaesarCipher.decrypt()". This method takes one optional argument: key -
+                    key (integer int), which will be used for decryption. If no key is specified,
+                    the method will try to perform a frequency analysis to get the key and then decode
+                    data. Note that keyless decryption may not work if the string
+                    with encrypted data is too small.
+
+            2. "VigenereCipher". This class implements the Vigenere cipher algorithm. Creation
+              an instance of a class goes like this:
+                  alphabet = Alphabet("abcdefghijklmnopqrstuvwxyz", 4) # Create the Latin alphabet
+                  my_cipher = VigenereCipher("Lorem ipsum dolor, sit amet.", alphabet)
+
+              The class constructor takes two required arguments: data - a string containing the data,
+              which you want to decrypt or encrypt; key - key (string) by which in
+              further encryption and decryption will be performed; and one optional -
+              _alphabet - the alphabet used in the string, which will be used for encryption
+               (default is Latin).
+
+              The "VigenereCipher" class contains the following methods:
+                  1. "VigenereCipher.to_string()". This method takes no arguments, will return a string
+                    with the data passed to the class constructor (see above).
+                  2. "VigenereCipher.encrypt()". This method takes no arguments, will return a string with
+                    encrypted data.
+                  3. "VigenereCipher.decrypt()". This method takes no arguments, will return a string with
+                    decrypted data.
+
+            3. "AtbashCipher". This class implements the Atbash cipher algorithm.Creation
+              an instance of a class goes like this:
+                  alphabet = Alphabet("abcdefghijklmnopqrstuvwxyz", 4) # Create the Latin alphabet
+                  my_cipher = AtbashCipher("Lorem ipsum dolor, sit amet.", alphabet)
+
+              The class constructor takes one required argument: data - a string containing
+              data that you want to decrypt or encrypt; and one optional -
+              _alphabet - the alphabet used in the string, which will be produced
+              encryption (default - Latin).
+
+              The AtbashCipher class contains the following methods:
+                  1. "AtbashCipher.to_string()". This method takes no arguments, will return a string
+                    with the data passed to the class constructor (see above).
+                  2. "AtbashCipher.encrypt()". This method takes no arguments, will return a string with
+                    encrypted data.
+                  3. "AtbashCipher.decrypt()". This method takes no arguments, will return a string with
+                    decrypted data.
+
+            4. "EnigmaCipher". This class implements the encryption algorithm of the Enigma encryption machine.
+              Please note that the combinations on all rotors are set in the same way as in the encryption
+              default machine.
+              The class is instantiated as follows:
+                  my_enigma = EnigmaCipher("Lorem ipsum dolor, sit amet.", rotor1="P",
+                                           rotor2="V", rotor3 = "S")
+
+              The class constructor takes one required argument: data - a string containing
+              data that you want to decrypt or encrypt; and three optional arguments:
+              rotor1 - letter assigned to the I-rotor; rotor2 - letter set on the II-rotor; rotor3 -
+              the letter assigned to the III-rotor.
+
+              The "EnigmaCipher" class contains one method:
+                  "EnigmaCipher.encrypt_decrypt()". This method takes no arguments, will return a string
+                  with decrypted or encrypted data.
+
+
+    Chapter III. Geometric figures
+        The Pymath project has a geometry package. This package contains tools for working with geometric
+        figures. This chapter will talk about this package.
+
+        Let's start with the "shapes.py" file. It contains classes for working with geometric shapes. These classes
+        are described below.
+            1. "Shape". This class is the superclass of all classes for 2D geometry.
+              This class is abstract, it is only needed to create a structure for all subclasses.
+              The class is instantiated as follows:
+                  my_shape = Shape(58, 49)
+
+              The class constructor takes two arguments: width - the width of the shape; height - the height of the shape.
+              This class has no implementation of methods, so creating an instance of the "Shape" class is almost
+              doesn't make sense.
+
+            2. "Angle". This class allows you to set an angle in a variable. Since the angle is formed by two beams,
+              it is not a 2D shape, hence the Angle class is not a subclass of Shape.
+              The class is instantiated as follows:
+                  my_angle = Angle(15)
+
+              The class constructor takes one argument: angle - the degree measure of the angle (in degrees only).
+              When displaying an instance of the "Angle" class on the screen, the following line will appear: "Angle x degrees, sharp",
+              where x is the degree measure of the angle, sharp is the type of angle (sharp, straight, obtuse, expanded, concave,
+              full).This class has one method:
+                  1. "Angle.change_angle()". This method is needed to change the degree measure of an angle. He
+                    takes one argument: new_angle - the new angle measure given by this
+                    the same rules as the one that is passed to the constructor of the "Angle" class (see above).
+
+            3. "Line". This class allows you to set a straight line in a variable. Since a straight line has no thickness,
+              it is not a two-dimensional shape, hence the Line class is not a subclass of Shape.
+              The class is instantiated as follows:
+                  my_line = Line(points = {"A": 1.3})
+
+              The class constructor takes one optional argument: points - a dictionary containing points
+              on a straight line, where the key is a point letter (capital letter of the Latin alphabet); value is a number,
+              denoting the coordinate of a point relative to point 0 on this line.
+
+              The "Line" class has the following methods:
+                  1. "Line.add_point()". This method is needed to add a point to a straight line. It takes two
+                    argument: letter - the letter of the period (capital letter of the Latin alphabet); x - coordinate
+                    dots (number).
+                  2. "Line.remove_point()". This method is needed to delete a point. Method takes one
+                    argument: letter - the letter of the period you want to delete (capital letter of latin
+                    alphabet).
+
+            4. "Segment". This class allows you to set a segment in a variable.Since a segment is a part
+              a straight line bounded by two points, therefore, a segment, like a straight line, has no thickness,
+              hence it is not a two-dimensional figure, hence the "Segment" class is not
+              subclass "Shape".
+              The creation of an instance of a class is as follows:
+                  my_segment = Segment(15, 16, 28, 41)
+
+              The class constructor takes four arguments: x1 - the coordinate of the first point of the line segment along the OX axis;
+              x2 - coordinate of the second point of the segment along the OX axis; y1 - coordinate of the first point of the segment along the OY axis;
+              y2 - coordinate of the second point of the segment along the OY axis.
+
+              The Segment class has the following methods:
+                  1. "Segment.get_length()". This method takes no arguments and is needed to calculate
+                    the length of the segment relative to the coordinates of its points. Returns a numeric object.
+                  2. "Segment.get_center()". This method takes no arguments and is needed to calculate
+                    coordinates of the midpoint of the segment. Returns a numeric object.
+
+            5. "Ray". This class allows you to set a ray in a variable. Since the ray is a geometrical figure,
+              consisting of a point and a straight line outgoing from it, therefore it has no thickness, therefore
+              is not a 2D geometric figure, hence the "Ray" class is not a subclass
+              "Shape".
+              The class is instantiated as follows:
+                  my_ray = Ray(0.398, 6.72)
+
+              The constructor of the "Ray" class takes two arguments: x - the coordinate of the initial point of the ray along the OX axis;
+              y - coordinate of the starting point of the ray along the OY axis. This class has no methods, except for
+              service.
+
+            6. "Ellipse". This class allows you to set an ellipse in a variable. An ellipse is a two-dimensional shape,
+              therefore the Ellipse class is a subclass of Shape.
+              The creation of an instance of a class is as follows:
+                  my_ellipse = Ellipse(150, 480)
+
+              The constructor of the "Ellipse" class is exactly the same as the constructor of the "Shape" class. He accepts
+              two arguments: width - the width of the bounding rectangle of the ellipse, that is, one of
+              ellipse diameters; height - the height of the bounding rectangle of the ellipse, i.e. the second
+              diameter of the ellipse.
+
+              The Ellipse class has the following methods:
+                  1. "Ellipse.area()". This method takes no arguments and is needed to calculate the area
+                    ellipse. Returns a numeric object.
+                  2. "Ellipse.perimeter()".This method takes no arguments and is needed to calculate the length
+                    ellipse. Returns a numeric object.
+                  3. "Ellipse.point()". This method is needed to calculate the coordinates of a point lying on an ellipse
+                    at a given angle. It takes one argument: angle - the angle at which to calculate
+                    point coordinates. Note that the angle must be specified in radians. The method will return
+                    numeric object.
+
+            7. "Circle". This class allows you to set a circle in a variable. Since in fact a circle
+              is an ellipse with equal diameters, the class "Circle" is a subclass of "Ellipse" (see above).
+              The class is instantiated as follows:
+                  my_circle = Circle(15.39)
+
+              The constructor of this class takes one argument: d - the diameter of the circle (number).
+              Since Circle is a subclass of Ellipse, the former inherits all of its methods. In addition to
+              For this, the "Circle" class has an additional method:
+                  "Circle.chord()". This method is needed to calculate the chord length from the central angle. He
+                  takes one argument: angle - the center angle in degrees. The method will return a numeric
+                  an object.
+
+            8. "RegularPolygon". This class allows you to set a regular polygon in a variable.
+              A polygon is a two-dimensional shape, hence the "RegularPolygon" class is
+              by the "Shape" class.The class is instantiated as follows:
+                  my_polygon = RegularPolygon(150, 8)
+
+              The class constructor takes two arguments: side_length - the length of each side of the polygon;
+              sides - number of sides.
+
+              The "RegularPolygon" class has two methods:
+                  1. "RegularPolygon.area()". This method takes no arguments and is needed to calculate
+                    the area of a regular polygon. Returns a numeric object.
+                  2. "RegularPolygon.perimeter()". This method takes no arguments and is needed to calculate
+                    the perimeter of the polygon. Returns a numeric object.
+
+            9. "IrregularPolygon". This class allows you to set an irregular polygon in a variable.
+              A polygon is a two-dimensional shape, hence the "IrregularPolygon" class is
+              a subclass of the "Shape" class.
+              The class is instantiated as follows:
+                  my_polygon = IrregularPolygon([[1, 3], [4, 3], [2, 1]) # Irregular triangle
+
+              The class constructor takes one argument: points - a list containing the coordinates of the vertices
+              polygon. This list should contain lists with two values: the first is a coordinate
+              vertices along the OX axis; the second is the coordinate of the vertex along the OY axis.
+
+              The IrregularPolygon class has one method:
+                  "IrregularPolygon.perimeter()". This method takes no arguments and is needed to calculate
+                  peri-
+                  meters of irregular polygon. Returns a numeric object.
+
+        The file "impossible_square.py" contains a class for drawing impossible squares on the Canvas
+        tkinter module. This class is called "ImpossibleSquare" and is the subject of this section.
+        The class is instantiated as follows:
+
+            root = Tk() # Create tkinter window
+            canvas = Canvas(root, width = 640, height = 480) # Create Canvas Canvas
+            my_isquare = ImpossibleSquare(canvas, (50, 50), size=(400, 400, 80),
+                                          colors=("red", "pink", "green", "cyan")) # Create impossible square
+            canvas.pack() # Draw the canvas on the window
+            root.mainloop() # Display the window
+
+        The class constructor takes two required arguments: canvas - the Canvas on which to
+        draw an impossible square; coordinates - the location of the upper left corner of the impossible
+        square on canvas, specified as a tuple, where the first value is the OX coordinate, the second is
+        coordinate along the OY axis.
+        Also, the constructor of the "ImpossibleSquare" class takes two optional arguments: size - dimensions
+        impossible square (x - length; y - width; z - height), by default equals (300, 300, 50);
+        colors - four colors of the impossible square, by default equal to ("gray", "lightgrey", "# 3b3b3b", "white").
+
+        This class has one method:
+            "ImpossibleSquare.draw()". This method takes no arguments and is needed to draw a square.
+            on canvas.
+
+        Note. When you run the file "impossible_square.py" as a separate program, the test will be launched,
+        which will first draw one big impossible square, and after the user closes the window with
+        many small squares will be drawn with a square.
+
+        The plot.py file contains the plotting tools. These tools are described below.
+            1. Class "Graph". This class is needed to save the formula in a variable, according to which it will be
+              plotted on the coordinate plane. The creation of an instance of the class is as follows
+              way:
+                  my_graph = Graph("y = 2 * x + 6", 0, 10, color="green") # Line graph
+
+              The class constructor takes three required arguments: formula - the formula for the graph, first_x -
+              the origin of the OX axis, preferably 0; ox_len - number of divisions on the OY axis. Also constructor
+              The class takes one optional argument: color - the color of the line of the garment, blue by default.
+
+              This class has the following methods:
+                  1. "Graph.create()". This method is needed to draw a graph on a coordinate plane. He
+                    takes one argument: canvas - the Canvas on which to draw the graph. The
+                    the method is called inside the "Plotter" class when all charts are drawn.
+
+            2. The "Plotter" class. This class is needed to display the coordinate plane for graphs.
+              on a tkinter window. The class is instantiated as follows:
+
+                  root = Tk() # Create tkinter window
+                  my_plotter = Plotter(root, 500, 350, range (1, 11),
+                                       range (1, 13), grid=True) # Create coordinate plane
+                  my_plotter.place(x=20, y=18) # Place the plane on the tkinter window
+                  root.mainloop() # Display the window
+
+              The class constructor takes five required arguments: root - the tkinter window that will host
+              to be a coordinate plane with graphs; width - the width of the coordinate plane; height -
+              coordinate line height; ox - range of numbers (range) for numbering the OX axis; oy - range
+              numbers for numbering the OY axis. Also the constructor of the "Plotter" class takes one optional
+              argument: grid - whether to display the grid (True or False), defaults to True.
+
+              This class has the following methods:
+                  1. "Plotter.place()". This method is needed to place the coordinate plane on the window. He
+                    takes two optional arguments: x - coordinate along the OX axis; y - coordinate along the OY axis.
+                  2. "Plotter.add_graph()". This method is needed to add a graph (an instance of the "Graph" class)
+                    to the list of graphs of the "Plotter" class. This list will be used when rendering all charts.
+                    on the coordinate plane. The "Plotter.add_graph()" method takes one argument: o -
+                    an instance of the "Graph" class to add to the list.
+                  3. "Plotter.remove_graph()". This method is needed to remove a chart from the list. He accepts
+                    one argument: id__ - index of the deleted chart in the list, starting from 0.
+                  4. "Plotter.clear()".This method is needed to clear the list of charts. Method does not accept
+                    arguments.
+                  5. "Plotter.enumerate_oxy()". When this method is called, the numbering of the axes of the coordinate
+                    planes OX and OY. The method takes no arguments, it is called in the class constructor
+                    "Plotter".
+                  6. "Plotter.draw_grid()". This method, when called, will draw a grid on the coordinate plane.
+                    It takes no arguments and is called when all graphs are rendered, if the "grid" argument is
+                    the constructor of the "Plotter" class is True.
+                  7. "Plotter.plot()". This method is needed to draw all graphs from the list on the coordinate
+                    plane. The method takes no arguments. "Plotter.plot ()" will draw a grid if the argument is
+                    The "grid" of the class constructor is True.
+
+              Note. When you run the "plot.py" file as a separate program, the test will be launched - the program,
+              which will draw graphs according to the forum, specified by the user in the input field. Wherein,
+              if you specify a formula different from the previous one in the input field and click on the "Build" button,
+              the coordinate plane will be cleared and a new plot will be plotted on it.
+
+        The file "pie_chart.py" contains tools for building pie charts. These tools are described below.
+            1. The "PieChart" class. This class allows you to create a flat pie chart in a tkinter window.
+              The class is instantiated as follows:
+
+                  root = Tk() # Create a tkinter window
+                  my_pie_chart = PieChart(380, 100, {"first": 100, "second": 20, "third": 80},
+                                                    {"first": "red", "second": "green", "third": "blue"}, root)
+                  my_pie_chart.draw(100, 30) # Draw the chart
+                  root.mainloop() # Launch the window
+
+              The class constructor takes five arguments: width - the width or height of the chart area
+              (it is square); radius - radius of the chart circle; values - the data dictionary to build
+              charts, where key is the name of the chart value, value is a numerical value;
+              colors - a dictionary containing colors for each of the data, where key is the name of the value,
+              value - the corresponding color; master - the "Tk" object (tkinter window) on which
+              the diagram is built.
+
+              The "PieChart" class has one method:
+                  "PieChart.draw()". The method is needed to draw the diagram area on a tkinter window. This method
+                  takes two arguments: x - coordinate of the chart area on the tkinter window along the OX axis;
+                  y - coordinate of the chart area along the OY axis.
+
+            2. The "LegendLabel" class.This class is needed to display in the area of a pie chart one
+              the lines of her legend. To create the entire legend, you need to create several instances of this class.
+              and render them. The class is used inside the "PieChart" class, it is ineffective when used
+              it separately. The class is instantiated as follows:
+
+                  root = Tk() # Create a tkinter window
+                  canvas = Canvas (root, width = 320, height = 240) # Create the canvas Canvas
+                  canvas.pack()
+
+                  my_legend = LegendLabel(canvas, "first - 50.0%", point_color = "red")
+                  my_legend.draw (5, 10) # Draw the legend line
+
+                  root.mainloop() # Start a tkinter window
+
+              The class constructor takes two required arguments: canvas - the Canvas on which
+              you need to create a legend line; text - the text of the string. Also the constructor takes one
+              optional argument: point_color - the color corresponding to the color of the value on the circle
+              the diagram, which defaults to "lightblue".
+
+              The LegendLabel class has one method:
+                "LegendLabel.draw()". This method is needed to draw the legend string on the Canvas. He
+                  takes two arguments: x - coordinate along the OX axis; y - coordinate along the OY axis.
+
+            Note. When you run the file "pie_chart.py" as a separate program, the test will be run,
+            in which a pie chart with a legend will be displayed on a tkinter window.
+
+    Chapter IV. Built-in utilities
+        The Pymath project contains not only packages with modules, but also small applications. This chapter describes these
+        applications.
+
+        1. Application "Clock". To run this application, run the "clock.pyw" file. At startup, it will open
+          a window where the current system time will be displayed in digital format (top) and a hand clock with
+          dial, hour, minute and second hands (in the middle). The pointer clock also depends on
+          system time.
+          The Clock app also has an OVERCLOCK (SPEED x66.7) button at the bottom. When you press this button, the watch
+          will start going 66.7 times faster than usual so that the minute hand will move at the speed of a second.
+          In this case, after pressing the button, it will now be written: "STOP OVERCLOCKING". After
+          You press the "STOP OVERCLOCKING" button, the clock will show the correct system time again and go
+          at normal speed. This button is a joke-play on words: overclock - overclocking (processor), and clock - clock.
+
+        2. Application "Text editor". Attention! In order for the "Text Editor" application to work
+          correct, requires Python's built-in IDLE wrapper. To run this application,
+          run the file "text_editor.pyw".
+          When launched, a window will open with a large field for entering text and a main menu at the top.Also at the bottom there is
+          status bar with two numbers indicating the current position of the tectogue curiosor: first number
+          denotes the row number, the second denotes the column number.
+          In general, the Text Editor application works like a regular Notepad from Windows, so I will not
+          focus on this. However, this application has some additions:
+              1. Ability to save a text document in PDF format. To do this, in the file menu
+                "Save As ..." in the "Save as type" drop-down list, select "Portable Document Format" and
+                click on the "Save" button.
+              2. Coloring the text. Each letter will be colored in a specific color. Note that not all characters
+                can be painted in colors; those for which no color is specified will remain black. In order to
+                use this function, go to the main menu | "Edit", then select "Fun".
+                You can also find this function in the context menu, which can be called by pressing the right button
+                mice. Attention! To keep the letters in their colors, save the file in PDF format (see above).
+              3. Canceling the coloring of the text. The colored text can be turned black again by going to
+                main menu | "Edit", then select "Normalize". You can also find this function in
+                a context menu that can be invoked by clicking the right mouse button.
+          Hotkeys:
+              1. Create a new file - Ctrl + N
+              2.Open file - Ctrl + O
+              3. Save file - Ctrl + S
+              4. Save file as ... - Ctrl + Shift + S
+              5. Print the file (to the default printer) - Ctrl + P
+              6. Exit - Alt + F4
+              7. Undo the last action - Ctrl + Z
+              8. Repeat the last action - Ctrl + Y
+              9. Cut - Ctrl + X
+              10. Copy - Ctrl + C
+              11. Paste - Ctrl + V
+              12. Select All - Ctrl + A
+              13. Find - Ctrl + F
+              14. Replace - Ctrl + R
+              15. Go - Ctrl + G
+              16. Insert current time and date - F5
+
+              Note. To use hotkeys with letters of the Latin alphabet, you need to switch
+              English layout.
+
+        3. Application "Graphics". In general, this application functionally does not differ from the built-in Windows OS
+            of the "Paint" application, so I will not go into detail about this application. I will name only the main
+            functional:
+                1. To draw a regular shape (square, circle), hold down the Left Shift key.
+                2. To save the picture, click on the "Export" button. The application supports two formats for
+                  save: in the form of PNG-images and GD-files (GD - Graphics Drawing). The latest format supports
+                  further loading into the application, changing and re-saving.
+                3. To open the picture, click on the "Import" button. As stated above, the application supports
+                  opening only files in GD format.
+                4. The "Graphics" application supports cell resizing. To change them, click on the button
+                  "Change" in the box labeled "Cage Size". Please note that when saving to PNG format
+                  the mesh is not saved in the file.
+
+          4. Application "Plotter". This appendix is a test for the "plot" module from the "geometry" package.
+            When you start the application, a window with a coordinate plane and an input field for formulas will open. For,
+            to build a graph, enter the formula and click on the "Build" button. In this case, the formula is required
+            must start with "y =", and no letters other than "x" can be used as an argument.Please note that if you plot a
+            graph using one formula, and then enter a new formula and
+            click "Build", the old schedule will be deleted, and a new one will be built in its place.
+
+
+    Chapter V. Features of import
+        The Pymath project uses a special system to import modules from it. In this chapter
+        we will talk about how to properly import modules from a project.
+
+        To import anything from a module from a package in a project, you can use the following scheme:
+            from pymath2.package.module import Class, function,
+        where "package" is the name of the package, "module" is the name of the module, "Class, function" is the class,
+        function, etc., as required import.
+
+        However, this import method will most likely be useful if you need
+        use any utility function, class, etc. In order to quickly import the
+        tool, use a schema like this:
+            from pymath2 import prime_factorization, Angle, Scale,
+        where "prime_factorization", "Angle", "Scale" are the instruments you need.
+
+        Also, as mentioned in Chapter IV, the Pymath project includes applications. Importing them is meaningless,
+        as they are designed to run as standalone applications. Some of them on import
+        will start, but will not work correctly.
+
+Thanks!
