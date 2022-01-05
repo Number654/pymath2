@@ -1,5 +1,7 @@
 # -*- coding: utf-8
 
+from abc import ABC
+from numbers import Real as RealNumber
 from .pymath import is_odd, gcd, lcm, prime_factorization, better_divmod, root, trunc
 
 
@@ -167,7 +169,7 @@ def solve_fraction_expr(expr):
 
 
 # Тип данных: дробь
-class Fraction:
+class Fraction(RealNumber, ABC):
 
     # Передаем в конструктор строку вида m/n
     def __init__(self, fraction):
@@ -216,6 +218,10 @@ class Fraction:
         a.numerator = -a.numerator
         a.update_fraction()  # Обновить дробь
         return a
+
+    # Унарный плюс (+x) - ничего не делает с числовым объектом
+    def __pos__(self):
+        return self
 
     # Функция сложения этой дроби с другой
     def __add__(self, other):
@@ -383,6 +389,39 @@ class Fraction:
     # Отсечь дробную часть и вернуть int
     def __int__(self):
         return self.integer_part
+
+    # Перевести во float с потерей точности
+    def __float__(self):
+        _f = self.format_to_improper_fraction()
+        return float(_f.numerator / _f.denominator)
+
+    def __ceil__(self):
+        if self < 0:
+            return self.format_to_mixed_number().integer_part
+        elif self == 0:
+            return 0
+
+        _f = self.format_to_mixed_number()
+        if _f.numerator == 0:
+            return _f.integer_part
+        return _f.integer_part+1
+
+    def __floor__(self):
+        if self > 0:
+            return self.format_to_mixed_number().integer_part
+        elif self == 0:
+            return 0
+
+        _f = self.format_to_mixed_number()
+        if _f.numerator == 0:
+            return _f.integer_part
+        return _f.integer_part-1
+
+    # Округлить обыкновенную дробь
+    def __round__(self, n=None):
+        # Обыкновенные дроби так просто не округлить
+        # Поэтому точность максимум до 15 знаков после запятой
+        return round(float(self), n)
 
     # Общий алгоритм сравнения дробей, нужно лишь указать нужный операнд сравнения
     def __compare(self, other, cmp_sign):
@@ -569,7 +608,7 @@ class LiteralFraction:
 
 
 # Числа с плавающей точкой неограниченной точности
-class Double:
+class Double(RealNumber, ABC):
 
     def __init__(self, double):
         # Передаем только строки.
@@ -602,6 +641,9 @@ class Double:
     # Поменять знак числа
     def __neg__(self):
         return Double("-"+self.double) if self.double[0] != "-" else Double(self.double[1:])
+
+    def __pos__(self):
+        return self
 
     # Сложение
     # Просто переводим тип Fraction в тип Double
@@ -716,6 +758,10 @@ class Double:
         self.assign(self.__pow__(power))
         return self
 
+    # Возведение в степень с показателем Double (с потерей точности в пок-теле)
+    def __rpow__(self, other):
+        return pow(other, float(self))
+
     # Остаток от деления
     def __mod__(self, other):
         return Double.from_fraction(abs(self - other*(self // other)))
@@ -756,6 +802,27 @@ class Double:
     # >=
     def __ge__(self, other):
         return self.__compare(other) >= 0
+
+    def __ceil__(self):
+        if self < 0:
+            return int(self.int_part)
+        elif self == 0:
+            return 0
+        if int(self.fraction_part) == 0:
+            return int(self.int_part)
+        return int(self.int_part)+1
+
+    def __floor__(self):
+        if self > 0:
+            return self.int_part
+        elif self == 0:
+            return 0
+        if int(self.fraction_part) == 0:
+            return int(self.int_part)
+        return int(self.int_part)-1
+
+    def __round__(self, n=0):
+        return self.round(accuracy=n)
 
     # Вычитаем из этой дроби другую
     # Потом сравниваем результат с нулем - это используется
